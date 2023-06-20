@@ -271,6 +271,17 @@ class ImageEditor:
         print("loss.mean()", loss.mean())
         return loss.mean()
 
+    def vgg_loss_dir_feature(self, x_in, y_in, style_image, text_y_embed):
+        x_features = get_features(self.vgg_normalize(x_in), self.vgg)
+        y_features = get_features(self.vgg_normalize(y_in), self.vgg)
+        style_features = get_features(
+            self.vgg_normalize(style_image), self.vgg)
+        text_features = get_features(
+            self.vgg_normalize(text_y_embed), self.vgg)
+        loss = 0
+
+        return loss.mean()
+
     def edit_image_by_image(self):
         text_y_embed = self.clip_model.encode_text(
             clip.tokenize(self.args.prompt_src).to(self.device)
