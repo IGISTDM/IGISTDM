@@ -476,7 +476,7 @@ class ImageEditor:
 
                         filename = Path(self.args.init_image).stem
                         visualization_path = visualization_path.with_name(
-                            f"{filename}_{self.args.prompt_tgt}_{iteration_number}{visualization_path.suffix}"
+                            f"0{filename}_{self.args.prompt_tgt}_{iteration_number}{visualization_path.suffix}"
                         )
 
                         if self.args.export_assets:
@@ -691,7 +691,7 @@ class ImageEditor:
 
                         filename = Path(self.args.init_image).stem
                         visualization_path = visualization_path.with_name(
-                            f"{filename}_{self.args.prompt_tgt}_{iteration_number}{visualization_path.suffix}"
+                            f"1{filename}_{self.args.prompt_tgt}_{iteration_number}{visualization_path.suffix}"
                         )
 
                         if self.args.export_assets:
