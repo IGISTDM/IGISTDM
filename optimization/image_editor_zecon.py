@@ -489,7 +489,7 @@ class ImageEditor:
                                 title=self.args.prompt_tgt,
                                 source_image=self.init_image_pil,
                                 edited_image=pred_image_pil,
-                                path=visualization_path,
+                                path=None,
                             )
 
                             visualization_path2 = str(
@@ -704,7 +704,7 @@ class ImageEditor:
                                 title=self.args.prompt_tgt,
                                 source_image=self.init_image_pil,
                                 edited_image=pred_image_pil,
-                                path=visualization_path,
+                                path=None,
                             )
 
                             visualization_path2 = str(
