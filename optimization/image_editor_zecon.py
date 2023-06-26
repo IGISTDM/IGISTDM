@@ -514,7 +514,7 @@ class ImageEditor:
                                 edited_image=pred_image_pil,
                                 # mask=self.style_image_pil,
                                 path=visualization_path,
-                                distance=f"{self.get_clip_score_image(self.init_image, self.style_image):.3f}"
+                                #distance=f"{self.get_clip_score_image(self.init_image, self.style_image):.3f}"
                             )
 
                             visualization_path2 = str(
@@ -730,7 +730,7 @@ class ImageEditor:
                                 source_image=self.init_image_pil,
                                 edited_image=pred_image_pil,
                                 path=visualization_path,
-                                distance=f"{self.get_clip_score_text(self.init_image,text_embed):.3f}"
+                                # distance=f"{self.get_clip_score_text(self.init_image,text_embed):.3f}"
                             )
 
                             visualization_path2 = str(
