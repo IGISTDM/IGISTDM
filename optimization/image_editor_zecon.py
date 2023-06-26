@@ -113,8 +113,8 @@ class ImageEditor:
         )
         self.image_size = (
             self.model_config["image_size"], self.model_config["image_size"])
-        style_image = Image.open(self.args.ref_image).convert("RGB")
-        style_image = style_image.resize(
+        self.style_image_pil = Image.open(self.args.ref_image).convert("RGB")
+        style_image = self.style_image_pil.resize(
             self.image_size, Image.LANCZOS)  # type: ignore
         style_image = (
             TF.to_tensor(style_image).to(
@@ -496,8 +496,7 @@ class ImageEditor:
                                 title=self.args.prompt_tgt,
                                 source_image=self.init_image_pil,
                                 edited_image=pred_image_pil,
-                                style_image=self.style_image,
-                                mask=self.style_image.cpu(),
+                                mask=self.style_image_pil,
                                 path=visualization_path,
                                 distance=self.get_clip_score(
                                     self.init_image, self.style_image, 1)

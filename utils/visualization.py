@@ -8,7 +8,6 @@ def show_edited_masked_image(
     title: str,
     source_image: Image,
     edited_image: Image,
-    style_image: Image = None,
     mask: Optional[Image] = None,
     path: Optional[Union[str, Path]] = None,
     distance: Optional[str] = None,
@@ -20,7 +19,7 @@ def show_edited_masked_image(
     fig = plt.figure(figsize=(12, 5))
     figure_title = f'"{title}"'
     if distance is not None:
-        if style_image is None:
+        if mask is None:
             figure_title += f"promet_({distance})"
         else:
             figure_title += f"image_({distance})"
