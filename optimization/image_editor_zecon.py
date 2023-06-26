@@ -307,7 +307,6 @@ class ImageEditor:
         return d_clip_loss(image_embeds_x, image_embeds_y, use_cosine=True)
 
     def edit_image_by_image(self):
-        a = self.clip_model.get
         text_y_embed = self.clip_model.encode_text(
             clip.tokenize(self.args.prompt_src).to(self.device)
         ).float()
