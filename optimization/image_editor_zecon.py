@@ -28,14 +28,7 @@ import matplotlib.pyplot as plt
 
 class ImageEditor:
     def __init__(self, args) -> None:
-        style_image = Image.open(self.args.ref_image).convert("RGB")
-        style_image = style_image.resize(
-            self.image_size, Image.LANCZOS)  # type: ignore
-        style_image = (
-            TF.to_tensor(style_image).to(
-                self.device).unsqueeze(0).mul(2).sub(1)
-        )
-        self.style_image = style_image
+
         self.args = args
         os.makedirs(self.args.output_path, exist_ok=True)
 
@@ -118,6 +111,14 @@ class ImageEditor:
         self.vgg_normalize = transforms.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )
+        style_image = Image.open(self.args.ref_image).convert("RGB")
+        style_image = style_image.resize(
+            self.image_size, Image.LANCZOS)  # type: ignore
+        style_image = (
+            TF.to_tensor(style_image).to(
+                self.device).unsqueeze(0).mul(2).sub(1)
+        )
+        self.style_image = style_image
 
     def unscale_timestep(self, t):
         unscaled_timestep = (t * (self.diffusion.num_timesteps / 1000)).long()
