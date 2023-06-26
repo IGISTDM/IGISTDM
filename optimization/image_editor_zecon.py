@@ -500,7 +500,7 @@ class ImageEditor:
                                 mask=self.style_image,
                                 path=visualization_path,
                                 distance=self.get_clip_score(
-                                    self.init_image_pil, self.style_image, 1)
+                                    self.init_image, self.style_image, 1)
                             )
 
                             visualization_path2 = str(
