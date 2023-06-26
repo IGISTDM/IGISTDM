@@ -111,6 +111,8 @@ class ImageEditor:
         self.vgg_normalize = transforms.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )
+        self.image_size = (
+            self.model_config["image_size"], self.model_config["image_size"])
         style_image = Image.open(self.args.ref_image).convert("RGB")
         style_image = style_image.resize(
             self.image_size, Image.LANCZOS)  # type: ignore
