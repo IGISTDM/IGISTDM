@@ -293,7 +293,7 @@ class ImageEditor:
 
         return loss.mean()
 
-    def get_clip_score(x_in, y_in, mode):
+    def get_clip_score(self, x_in, y_in, mode):
         augmented_input_x = self.patch_augmentations(
             x_in, num_patch=self.args.n_patch).add(1).div(2)
         clip_in_x = self.clip_normalize(augmented_input_x)
@@ -718,7 +718,7 @@ class ImageEditor:
                                 edited_image=pred_image_pil,
                                 path=visualization_path,
                                 distance=self.get_clip_score(
-                                    self.style_image, text_embed, 0),
+                                    self.init_image, text_embed, 0),
                             )
 
                             visualization_path2 = str(
