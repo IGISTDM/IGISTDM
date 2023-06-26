@@ -719,7 +719,7 @@ class ImageEditor:
                                 edited_image=pred_image_pil,
                                 path=visualization_path,
                                 distance=self.get_clip_score(
-                                    self.init_image_pil, text_embed, 0)
+                                    self.init_image, text_embed, 0)
                             )
 
                             visualization_path2 = str(
