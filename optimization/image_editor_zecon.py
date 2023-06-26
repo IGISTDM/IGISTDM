@@ -28,6 +28,14 @@ import matplotlib.pyplot as plt
 
 class ImageEditor:
     def __init__(self, args) -> None:
+        style_image = Image.open(self.args.ref_image).convert("RGB")
+        style_image = style_image.resize(
+            self.image_size, Image.LANCZOS)  # type: ignore
+        style_image = (
+            TF.to_tensor(style_image).to(
+                self.device).unsqueeze(0).mul(2).sub(1)
+        )
+        self.style_image = style_image
         self.args = args
         os.makedirs(self.args.output_path, exist_ok=True)
 
@@ -282,7 +290,22 @@ class ImageEditor:
 
         return loss.mean()
 
+    def get_clip_score(x_in, y_in, mode):
+
+        augmented_input_x = self.patch_augmentations(
+            x_in, num_patch=self.args.n_patch).add(1).div(2)
+        clip_in_x = self.clip_normalize(augmented_input_x)
+        image_embeds_x = self.clip_model.encode_image(clip_in_x).float()
+        image_embeds_y = y_in
+        if mode:
+            augmented_input_y = self.patch_augmentations(
+                y_in, num_patch=self.args.n_patch, is_global=True).add(1).div(2)
+            clip_in_y = self.clip_normalize(augmented_input_y)
+            image_embeds_y = self.clip_model.encode_image(clip_in_y).float()
+        return d_clip_loss(image_embeds_x, image_embeds_y, use_cosine=True)
+
     def edit_image_by_image(self):
+        a = self.clip_model.get
         text_y_embed = self.clip_model.encode_text(
             clip.tokenize(self.args.prompt_src).to(self.device)
         ).float()
@@ -302,13 +325,6 @@ class ImageEditor:
         )
 
         def cond_fn(x, t, y=None):
-            style_image = Image.open(self.args.ref_image).convert("RGB")
-            style_image = style_image.resize(
-                self.image_size, Image.LANCZOS)  # type: ignore
-            style_image = (
-                TF.to_tensor(style_image).to(
-                    self.device).unsqueeze(0).mul(2).sub(1)
-            )
 
             with torch.enable_grad():
                 x = x.detach().requires_grad_()
@@ -324,14 +340,14 @@ class ImageEditor:
                 loss = torch.tensor(0)
                 if self.args.l_clip_global != 0:
                     clip_loss = self.clip_global_loss_feature(
-                        x_in, style_image) * self.args.l_clip_global
+                        x_in, self.style_image) * self.args.l_clip_global
                     loss = loss + clip_loss
                     self.metrics_accumulator.update_metric(
                         "clip_loss_feature", clip_loss.item())
 
                 if self.args.l_clip_global_patch != 0:
                     clip_patch_loss = self.clip_global_patch_loss_feature(
-                        x_in, style_image) * self.args.l_clip_global_patch
+                        x_in, self.style_image) * self.args.l_clip_global_patch
                     loss = loss + clip_patch_loss
                     self.metrics_accumulator.update_metric(
                         "clip_patch_loss_feature", clip_patch_loss.item())
@@ -341,7 +357,7 @@ class ImageEditor:
                     y_in = self.init_image * fac + y_t * (1 - fac)
 
                     clip_dir_patch_loss_feature = self.clip_dir_patch_loss_feature(
-                        x_in, y_in, style_image, text_y_embed) * self.args.l_clip_dir_patch
+                        x_in, y_in, self.style_image, text_y_embed) * self.args.l_clip_dir_patch
                     loss = loss + clip_dir_patch_loss_feature
                     self.metrics_accumulator.update_metric(
                         "clip_dir_patch_loss_feature", clip_dir_patch_loss_feature.item())
@@ -380,16 +396,6 @@ class ImageEditor:
                     loss = loss + r_loss
                     self.metrics_accumulator.update_metric(
                         "range_loss : ", r_loss.item())
-                '''
-                if self.args.l_vgg != 0 and t.item() < 800:
-                    vgg_loss_feature = self.vgg_loss_feature(
-                        x_in, style_image) * self.args.l_vgg * 2
-                    loss = loss + vgg_loss_feature
-                    self.metrics_accumulator.update_metric(
-                        "vgg_loss_feature : ", vgg_loss_feature.item())
-                self.metrics_accumulator.update_metric(
-                    "total_loss : ", loss.item())
-                '''
                 return -torch.autograd.grad(loss, x)[0]
 
         save_image_interval = self.diffusion.num_timesteps // 5
@@ -476,7 +482,7 @@ class ImageEditor:
 
                         filename = Path(self.args.init_image).stem
                         visualization_path = visualization_path.with_name(
-                            f"0{filename}_{self.args.prompt_tgt}_{iteration_number}{visualization_path.suffix}"
+                            f"image_{filename}_{self.args.prompt_tgt}_{iteration_number}{visualization_path.suffix}"
                         )
 
                         if self.args.export_assets:
@@ -489,13 +495,15 @@ class ImageEditor:
                                 title=self.args.prompt_tgt,
                                 source_image=self.init_image_pil,
                                 edited_image=pred_image_pil,
-                                path=None,
+                                path=visualization_path,
+                                distance=self.get_clip_score(
+                                    self.init_image_pil, self.style_image, 1)
                             )
 
                             visualization_path2 = str(
                                 visualization_path).replace('.png', '_output_image.png')
                             pred_image_arr = np.array(pred_image_pil)
-                            plt.imsave(visualization_path2, pred_image_arr)
+                            # plt.imsave(visualization_path2, pred_image_arr)
 
     def edit_image_by_prompt(self):
 
@@ -691,7 +699,7 @@ class ImageEditor:
 
                         filename = Path(self.args.init_image).stem
                         visualization_path = visualization_path.with_name(
-                            f"1{filename}_{self.args.prompt_tgt}_{iteration_number}{visualization_path.suffix}"
+                            f"promet_{filename}_{self.args.prompt_tgt}_{iteration_number}{visualization_path.suffix}"
                         )
 
                         if self.args.export_assets:
@@ -704,10 +712,12 @@ class ImageEditor:
                                 title=self.args.prompt_tgt,
                                 source_image=self.init_image_pil,
                                 edited_image=pred_image_pil,
-                                path=None,
+                                path=visualization_path,
+                                distance=self.get_clip_score(
+                                    self.init_image_pil, text_embed, 0)
                             )
 
                             visualization_path2 = str(
                                 visualization_path).replace('.png', '_output_promet.png')
                             pred_image_arr = np.array(pred_image_pil)
-                            plt.imsave(visualization_path2, pred_image_arr)
+                            # plt.imsave(visualization_path2, pred_image_arr)
