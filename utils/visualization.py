@@ -8,6 +8,7 @@ def show_edited_masked_image(
     title: str,
     source_image: Image,
     edited_image: Image,
+    style_image: Image = None,
     mask: Optional[Image] = None,
     path: Optional[Union[str, Path]] = None,
     distance: Optional[str] = None,
@@ -17,9 +18,12 @@ def show_edited_masked_image(
     cols = 3 if mask is not None else 2
 
     fig = plt.figure(figsize=(12, 5))
-    figure_title = f'Prompt: "{title}"'
+    figure_title = f'"{title}"'
     if distance is not None:
-        figure_title += f" ({distance})"
+        if style_image is None:
+            figure_title += f"promet_({distance})"
+        else:
+            figure_title += f"image_({distance})"
     plt.title(figure_title)
     plt.axis("off")
 

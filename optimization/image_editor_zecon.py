@@ -483,7 +483,7 @@ class ImageEditor:
 
                         filename = Path(self.args.init_image).stem
                         visualization_path = visualization_path.with_name(
-                            f"image_{filename}_{self.args.prompt_tgt}_{iteration_number}{visualization_path.suffix}"
+                            f"{filename}_{self.args.prompt_tgt}_{iteration_number}{visualization_path.suffix}"
                         )
 
                         if self.args.export_assets:
@@ -496,6 +496,8 @@ class ImageEditor:
                                 title=self.args.prompt_tgt,
                                 source_image=self.init_image_pil,
                                 edited_image=pred_image_pil,
+                                style_image=self.style_image,
+                                mask=self.style_image,
                                 path=visualization_path,
                                 distance=self.get_clip_score(
                                     self.init_image_pil, self.style_image, 1)
@@ -700,7 +702,7 @@ class ImageEditor:
 
                         filename = Path(self.args.init_image).stem
                         visualization_path = visualization_path.with_name(
-                            f"promet_{filename}_{self.args.prompt_tgt}_{iteration_number}{visualization_path.suffix}"
+                            f"{filename}_{self.args.prompt_tgt}_{iteration_number}{visualization_path.suffix}"
                         )
 
                         if self.args.export_assets:
