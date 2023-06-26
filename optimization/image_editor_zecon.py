@@ -497,7 +497,7 @@ class ImageEditor:
                                 source_image=self.init_image_pil,
                                 edited_image=pred_image_pil,
                                 style_image=self.style_image,
-                                mask=self.style_image,
+                                mask=self.style_image.cpu(),
                                 path=visualization_path,
                                 distance=self.get_clip_score(
                                     self.init_image, self.style_image, 1)
