@@ -293,7 +293,22 @@ class ImageEditor:
 
         return loss.mean()
 
-    def get_clip_score(self, x_in, y_in, mode):
+    def get_clip_score_text(self, x_in, y_in):
+        with torch.no_grad():
+            image1_embedding = self.clip_model.encode_image(x_in)
+        similarity_score = clip.cosine_similarity(
+            image1_embedding, y_in).item()
+        return similarity_score
+
+    def get_clip_score_image(self, x_in, y_in):
+        with torch.no_grad():
+            image1_embedding = self.clip_model.encode_image(x_in)
+            image2_embedding = self.clip_model.encode_image(y_in)
+        similarity_score = clip.cosine_similarity(
+            image1_embedding, image2_embedding).item()
+        return similarity_score
+
+        '''
         augmented_input_x = self.patch_augmentations(
             x_in, num_patch=self.args.n_patch).add(1).div(2)
         clip_in_x = self.clip_normalize(augmented_input_x)
@@ -305,6 +320,7 @@ class ImageEditor:
             clip_in_y = self.clip_normalize(augmented_input_y)
             image_embeds_y = self.clip_model.encode_image(clip_in_y).float()
         return d_clip_loss(image_embeds_x, image_embeds_y, use_cosine=True)
+        '''
 
     def edit_image_by_image(self):
         text_y_embed = self.clip_model.encode_text(
@@ -496,10 +512,9 @@ class ImageEditor:
                                 title=self.args.prompt_tgt,
                                 source_image=self.init_image_pil,
                                 edited_image=pred_image_pil,
-                                mask=self.style_image_pil,
+                                # mask=self.style_image_pil,
                                 path=visualization_path,
-                                distance=self.get_clip_score(
-                                    self.init_image, self.style_image, 1)
+                                distance=f"{self.get_clip_score_image(self.init_image, self.style_image):.3f}"
                             )
 
                             visualization_path2 = str(
@@ -715,8 +730,7 @@ class ImageEditor:
                                 source_image=self.init_image_pil,
                                 edited_image=pred_image_pil,
                                 path=visualization_path,
-                                distance=self.get_clip_score(
-                                    self.init_image, text_embed, 0),
+                                distance=f"{self.get_clip_score_text(self.init_image,text_embed):.3f}"
                             )
 
                             visualization_path2 = str(

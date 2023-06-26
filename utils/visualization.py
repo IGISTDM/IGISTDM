@@ -30,14 +30,14 @@ def show_edited_masked_image(
     fig_idx += 1
     _set_image_plot_name("Source Image")
     plt.imshow(source_image)
-
+    '''
     if mask is not None:
         fig.add_subplot(rows, cols, fig_idx)
         _set_image_plot_name("Mask")
         plt.imshow(mask)
         plt.gray()
         fig_idx += 1
-
+    '''
     fig.add_subplot(rows, cols, fig_idx)
     _set_image_plot_name("Edited Image")
     plt.imshow(edited_image)
