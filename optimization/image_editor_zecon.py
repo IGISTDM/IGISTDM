@@ -327,6 +327,8 @@ class ImageEditor:
 
     def save_image(self):
         for i in range(len(self.saved_image["text"])):
+            if (i+1) % 5 != 0:
+                continue
             fig, axs = plt.subplots(2, 2, figsize=(10, 8))
 
             axs[0, 0].imshow(self.style_image_pil)
@@ -334,11 +336,13 @@ class ImageEditor:
 
             axs[0, 1].imshow(self.saved_image["text"][i])
             axs[0, 1].set_title('prompt')
-            axs[0, 1].set_xlabel('CLIP SCORE = {}'.format(0))
+            axs[0, 1].set_xlabel('CLIP SCORE = {}'.format(
+                self.clip_global_loss(self.saved_image["text"][i], self.args.prompt_tgt)))
 
             axs[1, 0].imshow(self.saved_image["image"][i])
             axs[1, 0].set_title('image')
-            axs[1, 0].set_xlabel('CLIP SCORE = {}'.format(0))
+            axs[1, 0].set_xlabel(
+                'CLIP SCORE = {}'.format(self.clip_global_loss_feature(self.saved_image["image"][i], self.style_image)))
 
             #axs[1, 1].imshow(self.saved_image["image+text"])
             #axs[1, 1].set_title('image+prompt')
@@ -352,7 +356,6 @@ class ImageEditor:
             )
             filename = Path(self.args.init_image).stem
             visualization_path = visualization_path.with_name(
-                            f"{filename}_{self.args.prompt_tgt}_{i}{visualization_path.suffix}"
                 f"{filename}_{self.args.prompt_tgt}_{i}{visualization_path.suffix}"
             )
             plt.savefig(visualization_path)
