@@ -357,9 +357,17 @@ class ImageEditor:
             axs[1, 0].set_xlabel(
                 'CLIP SCORE = {}'.format(self.clip_global_loss_feature(image, self.style_image)))
 
+            image = self.saved_image["image+text"][i]
+            image = (TF.to_tensor(image).to(
+                self.device).unsqueeze(0).mul(2).sub(1))
+            text = self.clip_model.encode_text(
+                clip.tokenize(self.args.prompt_tgt).to(self.device)
+            ).float()
+
             axs[1, 1].imshow(self.saved_image["image+text"])
             axs[1, 1].set_title('image+prompt')
-            axs[1, 1].set_xlabel('CLIP SCORE = {}'.format(0))
+            axs[1, 1].set_xlabel('CLIP SCORE = {}'.format((self.clip_global_loss_feature(
+                image, self.style_image)+self.clip_global_loss(image, text))*0.5))
 
             # 調整子圖間距
             plt.tight_layout()
