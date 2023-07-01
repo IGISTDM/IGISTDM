@@ -28,7 +28,10 @@ import matplotlib.pyplot as plt
 
 class ImageEditor:
     def __init__(self, args) -> None:
-
+        self.saved_image = {}
+        self.saved_image["text"] = []
+        self.saved_image["image"] = []
+        self.saved_image["image+text"] = []
         self.args = args
         os.makedirs(self.args.output_path, exist_ok=True)
 
@@ -322,6 +325,31 @@ class ImageEditor:
         return d_clip_loss(image_embeds_x, image_embeds_y, use_cosine=True)
         '''
 
+    def save_image(self):
+        for i in range(self.saved_image["text"].length):
+            fig, axs = plt.subplots(2, 2, figsize=(10, 8))
+
+            axs[0, 0].imshow(self.style_image)
+            axs[0, 0].set_title("prompt : " + self.args.prompt_tgt)
+
+            axs[0, 1].imshow(self.saved_image["text"])
+            axs[0, 1].set_title('prompt')
+            axs[0, 1].set_xlabel('CLIP SCORE = {}'.format(0))
+
+            axs[1, 0].imshow(self.saved_image["image"])
+            axs[1, 0].set_title('image')
+            axs[1, 0].set_xlabel('CLIP SCORE = {}'.format(0))
+
+            axs[1, 1].imshow(self.saved_image["image+text"])
+            axs[1, 1].set_title('image+prompt')
+            axs[1, 1].set_xlabel('CLIP SCORE = {}'.format(0))
+
+            # 調整子圖間距
+            plt.tight_layout()
+
+            # 儲存圖片
+            plt.savefig(self.args.prompt_tgt+"_"+self.args.ref_image+i+".jpg")
+
     def edit_image_by_image(self):
         text_y_embed = self.clip_model.encode_text(
             clip.tokenize(self.args.prompt_src).to(self.device)
@@ -508,6 +536,7 @@ class ImageEditor:
 
                         intermediate_samples[b].append(pred_image_pil)
                         if should_save_image:
+                            '''
                             show_edited_masked_image(
                                 title=self.args.prompt_tgt,
                                 source_image=self.init_image_pil,
@@ -516,11 +545,260 @@ class ImageEditor:
                                 path=visualization_path,
                                 #distance=f"{self.get_clip_score_image(self.init_image, self.style_image):.3f}"
                             )
+                            '''
 
                             visualization_path2 = str(
                                 visualization_path).replace('.png', '_output_image.png')
                             pred_image_arr = np.array(pred_image_pil)
-                            plt.imsave(visualization_path2, pred_image_arr)
+                            self.saved_image["image"].append(pred_image_arr)
+                            #plt.imsave(visualization_path2, pred_image_arr)
+
+    def edit_image_by_image_prompt(self):
+
+        text_embed = self.clip_model.encode_text(
+            clip.tokenize(self.args.prompt_tgt).to(self.device)
+        ).float()
+        text_y_embed = self.clip_model.encode_text(
+            clip.tokenize(self.args.prompt_src).to(self.device)
+        ).float()
+
+        self.image_size = (
+            self.model_config["image_size"], self.model_config["image_size"])
+        self.init_image_pil = Image.open(self.args.init_image).convert("RGB")
+        self.init_image_pil = self.init_image_pil.resize(
+            self.image_size, Image.LANCZOS)  # type: ignore
+        self.init_image = (
+            TF.to_tensor(self.init_image_pil).to(
+                self.device).unsqueeze(0).mul(2).sub(1)
+        )
+        visualization_path = visualization_path = Path(
+            os.path.join(self.args.output_path, self.args.output_file)
+        )
+
+        def cond_fn(x, t, y=None):
+            if self.args.prompt_tgt == "":
+                return torch.zeros_like(x)
+
+            with torch.enable_grad():
+                x = x.detach().requires_grad_()
+                t = self.unscale_timestep(t)
+
+                out = self.diffusion.p_mean_variance(
+                    self.model, x, t, clip_denoised=False, model_kwargs={"y": y}
+                )
+
+                fac = self.diffusion.sqrt_one_minus_alphas_cumprod[t[0].item()]
+                x_in = out["pred_xstart"] * fac + x * (1 - fac)
+
+                loss = torch.tensor(0)
+
+                # image loss
+                if self.args.l_clip_global != 0:
+                    clip_loss = self.clip_global_loss_feature(
+                        x_in, self.style_image) * self.args.l_clip_global
+                    loss = loss + clip_loss
+                    self.metrics_accumulator.update_metric(
+                        "clip_loss_feature", clip_loss.item())
+
+                if self.args.l_clip_global_patch != 0:
+                    clip_patch_loss = self.clip_global_patch_loss_feature(
+                        x_in, self.style_image) * self.args.l_clip_global_patch
+                    loss = loss + clip_patch_loss
+                    self.metrics_accumulator.update_metric(
+                        "clip_patch_loss_feature", clip_patch_loss.item())
+
+                if self.args.l_clip_dir_patch != 0:
+                    y_t = self.diffusion.q_sample(self.init_image, t)
+                    y_in = self.init_image * fac + y_t * (1 - fac)
+
+                    clip_dir_patch_loss_feature = self.clip_dir_patch_loss_feature(
+                        x_in, y_in, self.style_image, text_y_embed) * self.args.l_clip_dir_patch
+                    loss = loss + clip_dir_patch_loss_feature
+                    self.metrics_accumulator.update_metric(
+                        "clip_dir_patch_loss_feature", clip_dir_patch_loss_feature.item())
+
+                # prompt loss
+                if self.args.l_clip_global != 0:
+                    clip_loss = self.clip_global_loss(
+                        x_in, text_embed) * self.args.l_clip_global
+                    loss = loss + clip_loss
+                    self.metrics_accumulator.update_metric(
+                        "clip_loss", clip_loss.item())
+
+                if self.args.l_clip_global_patch != 0:
+                    clip_patch_loss = self.clip_global_patch_loss(
+                        x_in, text_embed) * self.args.l_clip_global_patch
+                    loss = loss + clip_patch_loss
+                    self.metrics_accumulator.update_metric(
+                        "clip_patch_loss", clip_patch_loss.item())
+
+                if self.args.l_clip_dir != 0:
+                    y_t = self.diffusion.q_sample(self.init_image, t)
+                    y_in = self.init_image * fac + y_t * (1 - fac)
+
+                    clip_dir_loss = self.clip_dir_loss(
+                        x_in, y_in, text_embed, text_y_embed) * self.args.l_clip_dir
+                    loss = loss + clip_dir_loss
+                    self.metrics_accumulator.update_metric(
+                        "clip_dir_loss", clip_dir_loss.item())
+
+                if self.args.l_clip_dir_patch != 0:
+                    y_t = self.diffusion.q_sample(self.init_image, t)
+                    y_in = self.init_image * fac + y_t * (1 - fac)
+
+                    clip_dir_patch_loss = self.clip_dir_patch_loss(
+                        x_in, y_in, text_embed, text_y_embed) * self.args.l_clip_dir_patch
+                    loss = loss + clip_dir_patch_loss
+                    self.metrics_accumulator.update_metric(
+                        "clip_dir_patch_loss", clip_dir_patch_loss.item())
+
+                if self.args.l_zecon != 0:
+                    y_t = self.diffusion.q_sample(self.init_image, t)
+                    y_in = self.init_image * fac + y_t * (1 - fac)
+
+                    zecon_loss = self.zecon_loss(
+                        x_in, y_in, t) * self.args.l_zecon
+                    loss = loss + zecon_loss
+                    self.metrics_accumulator.update_metric(
+                        "zecon_loss", zecon_loss.item())
+
+                if self.args.l_mse != 0 and t.item() < 700:
+                    y_t = self.diffusion.q_sample(self.init_image, t)
+                    y_in = self.init_image * fac + y_t * (1 - fac)
+
+                    mse_loss = self.mse_loss(x_in, y_in) * self.args.l_mse
+                    loss = loss + mse_loss
+                    self.metrics_accumulator.update_metric(
+                        "mse_loss", mse_loss.item())
+
+                if self.args.l_vgg != 0 and t.item() < 800:
+                    y_t = self.diffusion.q_sample(self.init_image, t)
+                    y_in = self.init_image * fac + y_t * (1 - fac)
+
+                    vgg_loss = self.vgg_loss(x_in, y_in) * self.args.l_vgg
+                    loss = loss + vgg_loss
+                    self.metrics_accumulator.update_metric(
+                        "vgg_loss", vgg_loss.item())
+
+                if self.args.range_lambda != 0:
+                    r_loss = range_loss(
+                        out["pred_xstart"]).sum() * self.args.range_lambda
+                    loss = loss + r_loss
+                    self.metrics_accumulator.update_metric(
+                        "range_loss", r_loss.item())
+                self.metrics_accumulator.update_metric(
+                    "total_loss", loss.item())
+                return -torch.autograd.grad(loss, x)[0]
+
+        save_image_interval = self.diffusion.num_timesteps // 5
+        for iteration_number in range(self.args.iterations_num):
+            fw = self.args.diffusion_type.split('_')[0]
+            bk = self.args.diffusion_type.split('_')[-1]
+
+            # Forward DDIM
+            if fw == 'ddim':
+                print("Forward Process to noise")
+                noise = self.diffusion.ddim_reverse_sample_loop(
+                    self.model,
+                    self.init_image,
+                    clip_denoised=False,
+                    skip_timesteps=self.args.skip_timesteps,
+                )
+
+            # Forward DDPM
+            elif fw == 'ddpm':
+                init_image_batch = torch.tile(
+                    self.init_image, dims=(self.args.batch_size, 1, 1, 1))
+                noise = self.diffusion.q_sample(
+                    x_start=init_image_batch,
+                    t=torch.tensor(self.diffusion.num_timesteps-int(
+                        self.args.skip_timesteps), dtype=torch.long, device=self.device),
+                    noise=torch.randn(
+                        (self.args.batch_size, 3, self.model_config["image_size"], self.model_config["image_size"]), device=self.device),
+                )
+            else:
+                raise ValueError
+
+            # Reverse DDPM
+            if bk == 'ddpm':
+                samples = self.diffusion.p_sample_loop_progressive(
+                    self.model,
+                    (
+                        self.args.batch_size,
+                        3,
+                        self.model_config["image_size"],
+                        self.model_config["image_size"],
+                    ),
+                    noise=noise if fw == 'ddim' else None,
+                    clip_denoised=False,
+                    model_kwargs={},
+                    cond_fn=cond_fn,
+                    progress=True,
+                    skip_timesteps=self.args.skip_timesteps,
+                    init_image=self.init_image,
+                )
+
+            # Reverse DDIM
+            elif bk == 'ddim':
+                samples = self.diffusion.ddim_sample_loop_progressive(
+                    self.model,
+                    (
+                        self.args.batch_size,
+                        3,
+                        self.model_config["image_size"],
+                        self.model_config["image_size"],
+                    ),
+                    noise=noise,
+                    clip_denoised=False,
+                    model_kwargs={},
+                    cond_fn=cond_fn,
+                    progress=True,
+                    skip_timesteps=self.args.skip_timesteps,
+                    eta=self.args.eta,
+                )
+
+            else:
+                raise ValueError
+
+            intermediate_samples = [[] for i in range(self.args.batch_size)]
+            total_steps = self.diffusion.num_timesteps - self.args.skip_timesteps - 1
+            for j, sample in enumerate(samples):
+                should_save_image = j % save_image_interval == 0 or j == total_steps
+                if should_save_image or self.args.save_video:
+                    self.metrics_accumulator.print_average_metric()
+
+                    for b in range(self.args.batch_size):
+                        pred_image = sample["pred_xstart"][b]
+                        pred_image = pred_image.add(1).div(2).clamp(0, 1)
+                        pred_image_pil = TF.to_pil_image(pred_image)
+
+                        filename = Path(self.args.init_image).stem
+                        visualization_path = visualization_path.with_name(
+                            f"{filename}_{self.args.prompt_tgt}_{iteration_number}{visualization_path.suffix}"
+                        )
+
+                        if self.args.export_assets:
+                            pred_path = self.assets_path / visualization_path.name
+                            pred_image_pil.save(pred_path)
+
+                        intermediate_samples[b].append(pred_image_pil)
+                        if should_save_image:
+                            '''
+                            show_edited_masked_image(
+                                title=self.args.prompt_tgt,
+                                source_image=self.init_image_pil,
+                                edited_image=pred_image_pil,
+                                path=visualization_path,
+                                # distance=f"{self.get_clip_score_text(self.init_image,text_embed):.3f}"
+                            )
+                            '''
+
+                            visualization_path2 = str(
+                                visualization_path).replace('.png', '_output_promet.png')
+                            pred_image_arr = np.array(pred_image_pil)
+                            self.saved_image["image+text"].append(
+                                pred_image_arr)
+                            #plt.imsave(visualization_path2, pred_image_arr)
 
     def edit_image_by_prompt(self):
 
@@ -725,6 +1003,7 @@ class ImageEditor:
 
                         intermediate_samples[b].append(pred_image_pil)
                         if should_save_image:
+                            '''
                             show_edited_masked_image(
                                 title=self.args.prompt_tgt,
                                 source_image=self.init_image_pil,
@@ -732,8 +1011,10 @@ class ImageEditor:
                                 path=visualization_path,
                                 # distance=f"{self.get_clip_score_text(self.init_image,text_embed):.3f}"
                             )
+                            '''
 
                             visualization_path2 = str(
                                 visualization_path).replace('.png', '_output_promet.png')
                             pred_image_arr = np.array(pred_image_pil)
-                            plt.imsave(visualization_path2, pred_image_arr)
+                            self.saved_image["text"].append(pred_image_arr)
+                            #plt.imsave(visualization_path2, pred_image_arr)
