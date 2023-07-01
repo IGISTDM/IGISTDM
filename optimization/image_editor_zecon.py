@@ -335,12 +335,8 @@ class ImageEditor:
             axs[0, 0].set_title("prompt : " + self.args.prompt_tgt)
 
             image = self.saved_image["text"][i]
-            image = image.resize(
-                self.image_size, Image.LANCZOS)  # type: ignore
-            image = (
-                TF.to_tensor(image).to(
-                    self.device).unsqueeze(0).mul(2).sub(1)
-            )
+            image = (TF.to_tensor(image).to(
+                self.device).unsqueeze(0).mul(2).sub(1))
 
             axs[0, 1].imshow(self.saved_image["text"][i])
             axs[0, 1].set_title('prompt')
@@ -348,8 +344,6 @@ class ImageEditor:
                 self.clip_global_loss(image, self.args.prompt_tgt)))
 
             image = self.saved_image["image"][i]
-            image = image.resize(
-                self.image_size, Image.LANCZOS)  # type: ignore
             image = (
                 TF.to_tensor(image).to(
                     self.device).unsqueeze(0).mul(2).sub(1)
