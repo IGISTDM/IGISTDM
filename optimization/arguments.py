@@ -17,7 +17,8 @@ def get_arguments() -> argparse.Namespace:
     parser.add_argument(
         "-r", "--ref_image", type=str, help="The path to the reference image input", required=False
     )
-    parser.add_argument("--mask", type=str, help="The path to the mask to edit with", default=None)
+    parser.add_argument("--mask", type=str,
+                        help="The path to the mask to edit with", default=None)
 
     # Diffusion
     parser.add_argument(
@@ -26,7 +27,7 @@ def get_arguments() -> argparse.Namespace:
         help="How to respace the intervals of the diffusion process (number between 1 and 1000).",
         default="100",
     )
-    
+
     parser.add_argument(
         "--skip_timesteps",
         type=int,
@@ -67,11 +68,16 @@ def get_arguments() -> argparse.Namespace:
     )
 
     # Augmentations
-    parser.add_argument("--aug_num", type=int, help="The number of augmentation", default=8)
-    parser.add_argument("--aug_prob", type=float, help="The probability of augmentation", default=1)
-    parser.add_argument("--n_patch", type=int, help="The number of patches", default=32)
-    parser.add_argument("--patch_min", type=float, help="Mininum patch scale", default=0.01)
-    parser.add_argument("--patch_max", type=float, help="Maximum patch scale", default=0.05)
+    parser.add_argument("--aug_num", type=int,
+                        help="The number of augmentation", default=8)
+    parser.add_argument("--aug_prob", type=float,
+                        help="The probability of augmentation", default=1)
+    parser.add_argument("--n_patch", type=int,
+                        help="The number of patches", default=32)
+    parser.add_argument("--patch_min", type=float,
+                        help="Mininum patch scale", default=0.01)
+    parser.add_argument("--patch_max", type=float,
+                        help="Maximum patch scale", default=0.05)
 
     # Loss
     parser.add_argument(
@@ -134,9 +140,10 @@ def get_arguments() -> argparse.Namespace:
         help="stochasticity of DDIM",
         default=0.0,
     )
-    
+
     # Misc
-    parser.add_argument("--seed", type=int, help="The random seed", default=404)
+    parser.add_argument("--seed", type=int,
+                        help="The random seed", default=404)
     parser.add_argument("--gpu_id", type=int, help="The GPU ID", default=0)
     parser.add_argument("--output_path", type=str, default="output")
     parser.add_argument(
@@ -146,7 +153,8 @@ def get_arguments() -> argparse.Namespace:
         help="The filename to save, must be png",
         default="output.png",
     )
-    parser.add_argument("--iterations_num", type=int, help="The number of iterations", default=5)
+    parser.add_argument("--iterations_num", type=int,
+                        help="The number of iterations", default=5)
     parser.add_argument(
         "--batch_size",
         type=int,
