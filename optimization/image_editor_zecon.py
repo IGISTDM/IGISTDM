@@ -327,8 +327,6 @@ class ImageEditor:
 
     def save_image(self):
         for i in range(len(self.saved_image["text"])):
-            if (i+1) % 5 != 0:
-                continue
             fig, axs = plt.subplots(2, 2, figsize=(10, 8))
 
             axs[0, 0].imshow(self.style_image_pil)
@@ -364,7 +362,7 @@ class ImageEditor:
                 clip.tokenize(self.args.prompt_tgt).to(self.device)
             ).float()
 
-            axs[1, 1].imshow(self.saved_image["image+text"])
+            axs[1, 1].imshow(self.saved_image["image+text"][i])
             axs[1, 1].set_title('image+prompt')
             axs[1, 1].set_xlabel('CLIP SCORE = {}'.format((self.clip_global_loss_feature(
                 image, self.style_image)+self.clip_global_loss(image, text))*0.5))
