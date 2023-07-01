@@ -786,7 +786,7 @@ class ImageEditor:
             intermediate_samples = [[] for i in range(self.args.batch_size)]
             total_steps = self.diffusion.num_timesteps - self.args.skip_timesteps - 1
             for j, sample in enumerate(samples):
-                should_save_image = j % save_image_interval == 0 or j == total_steps
+                should_save_image = j == total_steps
                 if should_save_image or self.args.save_video:
                     self.metrics_accumulator.print_average_metric()
 
