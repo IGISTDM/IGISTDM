@@ -347,8 +347,15 @@ class ImageEditor:
             # 調整子圖間距
             plt.tight_layout()
 
-            # 儲存圖片
-            plt.savefig(self.args.prompt_tgt+"_"+self.args.ref_image+i+".jpg")
+            visualization_path = visualization_path = Path(
+                os.path.join(self.args.output_path, self.args.output_file)
+            )
+            filename = Path(self.args.init_image).stem
+            visualization_path = visualization_path.with_name(
+                            f"{filename}_{self.args.prompt_tgt}_{i}{visualization_path.suffix}"
+                f"{filename}_{self.args.prompt_tgt}_{i}{visualization_path.suffix}"
+            )
+            plt.savefig(visualization_path)
 
     def edit_image_by_image(self):
         text_y_embed = self.clip_model.encode_text(
