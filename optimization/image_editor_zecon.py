@@ -332,11 +332,11 @@ class ImageEditor:
             axs[0, 0].imshow(self.style_image_pil)
             axs[0, 0].set_title("prompt : " + self.args.prompt_tgt)
 
-            axs[0, 1].imshow(self.saved_image["text"])
+            axs[0, 1].imshow(self.saved_image["text"][i])
             axs[0, 1].set_title('prompt')
             axs[0, 1].set_xlabel('CLIP SCORE = {}'.format(0))
 
-            axs[1, 0].imshow(self.saved_image["image"])
+            axs[1, 0].imshow(self.saved_image["image"][i])
             axs[1, 0].set_title('image')
             axs[1, 0].set_xlabel('CLIP SCORE = {}'.format(0))
 
