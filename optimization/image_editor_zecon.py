@@ -334,15 +334,31 @@ class ImageEditor:
             axs[0, 0].imshow(self.style_image_pil)
             axs[0, 0].set_title("prompt : " + self.args.prompt_tgt)
 
+            image = self.saved_image["text"][i]
+            image = image.resize(
+                self.image_size, Image.LANCZOS)  # type: ignore
+            image = (
+                TF.to_tensor(image).to(
+                    self.device).unsqueeze(0).mul(2).sub(1)
+            )
+
             axs[0, 1].imshow(self.saved_image["text"][i])
             axs[0, 1].set_title('prompt')
             axs[0, 1].set_xlabel('CLIP SCORE = {}'.format(
-                self.clip_global_loss(self.saved_image["text"][i], self.args.prompt_tgt)))
+                self.clip_global_loss(image, self.args.prompt_tgt)))
+
+            image = self.saved_image["image"][i]
+            image = image.resize(
+                self.image_size, Image.LANCZOS)  # type: ignore
+            image = (
+                TF.to_tensor(image).to(
+                    self.device).unsqueeze(0).mul(2).sub(1)
+            )
 
             axs[1, 0].imshow(self.saved_image["image"][i])
             axs[1, 0].set_title('image')
             axs[1, 0].set_xlabel(
-                'CLIP SCORE = {}'.format(self.clip_global_loss_feature(self.saved_image["image"][i], self.style_image)))
+                'CLIP SCORE = {}'.format(self.clip_global_loss_feature(image, self.style_image)))
 
             #axs[1, 1].imshow(self.saved_image["image+text"])
             #axs[1, 1].set_title('image+prompt')
