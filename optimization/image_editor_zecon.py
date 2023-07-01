@@ -329,7 +329,7 @@ class ImageEditor:
         for i in range(len(self.saved_image["text"])):
             fig, axs = plt.subplots(2, 2, figsize=(10, 8))
 
-            axs[0, 0].imshow(self.style_image)
+            axs[0, 0].imshow(self.style_image_pil)
             axs[0, 0].set_title("prompt : " + self.args.prompt_tgt)
 
             axs[0, 1].imshow(self.saved_image["text"])
