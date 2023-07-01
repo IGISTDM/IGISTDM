@@ -340,9 +340,9 @@ class ImageEditor:
             axs[1, 0].set_title('image')
             axs[1, 0].set_xlabel('CLIP SCORE = {}'.format(0))
 
-            axs[1, 1].imshow(self.saved_image["image+text"])
-            axs[1, 1].set_title('image+prompt')
-            axs[1, 1].set_xlabel('CLIP SCORE = {}'.format(0))
+            #axs[1, 1].imshow(self.saved_image["image+text"])
+            #axs[1, 1].set_title('image+prompt')
+            #axs[1, 1].set_xlabel('CLIP SCORE = {}'.format(0))
 
             # 調整子圖間距
             plt.tight_layout()

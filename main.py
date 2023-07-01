@@ -9,5 +9,5 @@ if __name__ == "__main__":
     torch.cuda.empty_cache()
     image_editor.edit_image_by_image()
     torch.cuda.empty_cache()
-    image_editor.edit_image_by_image_prompt()
+    # image_editor.edit_image_by_image_prompt()
     image_editor.save_image()
