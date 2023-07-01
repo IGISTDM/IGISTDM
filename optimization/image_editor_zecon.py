@@ -337,11 +337,14 @@ class ImageEditor:
             image = self.saved_image["text"][i]
             image = (TF.to_tensor(image).to(
                 self.device).unsqueeze(0).mul(2).sub(1))
+            text = self.clip_model.encode_text(
+                clip.tokenize(self.args.prompt_tgt).to(self.device)
+            ).float()
 
             axs[0, 1].imshow(self.saved_image["text"][i])
             axs[0, 1].set_title('prompt')
             axs[0, 1].set_xlabel('CLIP SCORE = {}'.format(
-                self.clip_global_loss(image, self.args.prompt_tgt)))
+                self.clip_global_loss(image, text)))
 
             image = self.saved_image["image"][i]
             image = (
