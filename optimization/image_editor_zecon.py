@@ -326,7 +326,7 @@ class ImageEditor:
         '''
 
     def save_image(self):
-        for i in range(self.saved_image["text"].length):
+        for i in range(len(self.saved_image["text"])):
             fig, axs = plt.subplots(2, 2, figsize=(10, 8))
 
             axs[0, 0].imshow(self.style_image)
