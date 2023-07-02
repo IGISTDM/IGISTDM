@@ -326,6 +326,7 @@ class ImageEditor:
         '''
 
     def save_image(self):
+        output_len = len(str(len(self.saved_image["text"])))
         for i in range(len(self.saved_image["text"])):
             fig, axs = plt.subplots(2, 2, figsize=(10, 8))
 
@@ -372,7 +373,8 @@ class ImageEditor:
             )
             filename = Path(self.args.init_image).stem
             visualization_path = visualization_path.with_name(
-                f"{filename}_{self.args.prompt_tgt}_{i}{visualization_path.suffix}"
+                "{}_{}_{}{}".format(filename, self.args.prompt_tgt, "{:0{width}d}".format(
+                    i, width=output_len), visualization_path.suffix)
             )
             plt.savefig(visualization_path)
 
@@ -543,7 +545,7 @@ class ImageEditor:
             total_steps = self.diffusion.num_timesteps - self.args.skip_timesteps - 1
             for j, sample in enumerate(samples):
                 print("?"+str(j))
-                should_save_image = j == total_steps
+                should_save_image = j % save_image_interval == 0 or j == total_steps
                 if should_save_image or self.args.save_video:
                     self.metrics_accumulator.print_average_metric()
 
@@ -768,7 +770,7 @@ class ImageEditor:
             intermediate_samples = [[] for i in range(self.args.batch_size)]
             total_steps = self.diffusion.num_timesteps - self.args.skip_timesteps - 1
             for j, sample in enumerate(samples):
-                should_save_image = j == total_steps
+                should_save_image = j % save_image_interval == 0 or j == total_steps
                 if should_save_image or self.args.save_video:
                     self.metrics_accumulator.print_average_metric()
 
@@ -988,7 +990,7 @@ class ImageEditor:
             intermediate_samples = [[] for i in range(self.args.batch_size)]
             total_steps = self.diffusion.num_timesteps - self.args.skip_timesteps - 1
             for j, sample in enumerate(samples):
-                should_save_image = j == total_steps
+                should_save_image = j % save_image_interval == 0 or j == total_steps
                 if should_save_image or self.args.save_video:
                     self.metrics_accumulator.print_average_metric()
 
