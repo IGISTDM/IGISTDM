@@ -341,7 +341,7 @@ class ImageEditor:
 
             axs[0, 1].imshow(self.saved_image["text"][i])
             axs[0, 1].set_title('prompt')
-            axs[0, 1].set_xlabel('CLIP SCORE(with image) = {}\nCLIP SCORE(with prompt) = {}'.format(
+            axs[0, 1].set_xlabel('CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}'.format(
                 self.clip_global_loss(image, text), self.clip_global_loss_feature(image, self.style_image)))
 
             image = self.saved_image["image"][i]
@@ -352,7 +352,7 @@ class ImageEditor:
 
             axs[1, 0].imshow(self.saved_image["image"][i])
             axs[1, 0].set_title('image')
-            axs[1, 0].set_xlabel('CLIP SCORE(with image) = {}\nCLIP SCORE(with prompt) = {}'.format(
+            axs[1, 0].set_xlabel('CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}'.format(
                 self.clip_global_loss(image, text), self.clip_global_loss_feature(image, self.style_image)))
 
             image = self.saved_image["image+text"][i]
@@ -361,7 +361,7 @@ class ImageEditor:
 
             axs[1, 1].imshow(self.saved_image["image+text"][i])
             axs[1, 1].set_title('image+prompt')
-            axs[1, 1].set_xlabel('CLIP SCORE(with image) = {}\nCLIP SCORE(with prompt) = {}'.format(
+            axs[1, 1].set_xlabel('CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}'.format(
                 self.clip_global_loss(image, text), self.clip_global_loss_feature(image, self.style_image)))
 
             # 調整子圖間距
