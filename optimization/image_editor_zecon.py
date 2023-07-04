@@ -378,25 +378,6 @@ class ImageEditor:
             )
             plt.savefig(visualization_path)
 
-    def show_vgg(self):
-        content_features = get_features(
-            self.vgg_normalize(self.style_image), self.vgg)
-        layers = {'0': 'conv1_1',
-                  '2': 'conv1_2',
-                  '5': 'conv2_1',
-                  '7': 'conv2_2',
-                  '10': 'conv3_1',
-                  '19': 'conv4_1',
-                  '21': 'conv4_2',
-                  '28': 'conv5_1',
-                  '31': 'conv5_2'
-                  }
-        index = 0
-        for i in content_features:
-            plt.plot(i)
-            plt.savefig('{}.jpg'.format(index))
-            index += 1
-
     def edit_image_by_image(self):
         text_y_embed = self.clip_model.encode_text(
             clip.tokenize(self.args.prompt_src).to(self.device)
