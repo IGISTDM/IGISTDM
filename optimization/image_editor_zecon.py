@@ -117,10 +117,10 @@ class ImageEditor:
         self.image_size = (
             self.model_config["image_size"], self.model_config["image_size"])
         self.style_image_pil = Image.open(self.args.ref_image).convert("RGB")
-        # style_image = self.style_image_pil.resize(
-        #     self.image_size, Image.LANCZOS)  # type: ignore
+        style_image = self.style_image_pil.resize(
+            self.image_size, Image.LANCZOS)  # type: ignore
         style_image = (
-            TF.to_tensor(self.style_image_pil).to(
+            TF.to_tensor(style_image).to(
                 self.device).unsqueeze(0).mul(2).sub(1)
         )
         self.style_image = style_image
