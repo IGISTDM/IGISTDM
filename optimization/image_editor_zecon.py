@@ -120,7 +120,7 @@ class ImageEditor:
         # style_image = self.style_image_pil.resize(
         #     self.image_size, Image.LANCZOS)  # type: ignore
         style_image = (
-            TF.to_tensor(style_image).to(
+            TF.to_tensor(self.style_image_pil).to(
                 self.device).unsqueeze(0).mul(2).sub(1)
         )
         self.style_image = style_image
