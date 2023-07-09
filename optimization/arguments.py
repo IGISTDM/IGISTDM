@@ -154,7 +154,7 @@ def get_arguments() -> argparse.Namespace:
         default="output.png",
     )
     parser.add_argument("--iterations_num", type=int,
-                        help="The number of iterations", default=5)
+                        help="The number of iterations", default=1)
     parser.add_argument(
         "--batch_size",
         type=int,
