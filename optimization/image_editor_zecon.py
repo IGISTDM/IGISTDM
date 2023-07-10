@@ -377,6 +377,19 @@ class ImageEditor:
                     i, width=output_len), visualization_path.suffix)
             )
             plt.savefig(visualization_path)
+            visualization_path_text = str(
+                visualization_path).replace('.png', 'text_{}.png'.format(i))
+
+            visualization_path_image = str(
+                visualization_path).replace('.png', 'text_{}.png'.format(i))
+
+            visualization_path_image_text = str(
+                visualization_path).replace('.png', 'text_{}.png'.format(i))
+
+            plt.imsave(visualization_path_text, self.saved_image["text"][i])
+            plt.imsave(visualization_path_image, self.saved_image["image"][i])
+            plt.imsave(visualization_path_image_text,
+                       self.saved_image["image+text"][i])
 
     def edit_image_by_image(self):
         text_y_embed = self.clip_model.encode_text(
@@ -544,7 +557,7 @@ class ImageEditor:
             intermediate_samples = [[] for i in range(self.args.batch_size)]
             total_steps = self.diffusion.num_timesteps - self.args.skip_timesteps - 1
             for j, sample in enumerate(samples):
-                should_save_image = j == total_steps
+                should_save_image = j % save_image_interval == 0 or j == total_steps
                 if should_save_image or self.args.save_video:
                     self.metrics_accumulator.print_average_metric()
 
@@ -769,7 +782,7 @@ class ImageEditor:
             intermediate_samples = [[] for i in range(self.args.batch_size)]
             total_steps = self.diffusion.num_timesteps - self.args.skip_timesteps - 1
             for j, sample in enumerate(samples):
-                should_save_image = j == total_steps
+                should_save_image = j % save_image_interval == 0 or j == total_steps
                 if should_save_image or self.args.save_video:
                     self.metrics_accumulator.print_average_metric()
 
@@ -989,7 +1002,7 @@ class ImageEditor:
             intermediate_samples = [[] for i in range(self.args.batch_size)]
             total_steps = self.diffusion.num_timesteps - self.args.skip_timesteps - 1
             for j, sample in enumerate(samples):
-                should_save_image = j == total_steps
+                should_save_image = j % save_image_interval == 0 or j == total_steps
                 if should_save_image or self.args.save_video:
                     self.metrics_accumulator.print_average_metric()
 
