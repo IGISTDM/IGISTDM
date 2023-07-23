@@ -270,7 +270,7 @@ class ImageEditor:
                            content_features['conv2_1']) ** 2)
         return loss.mean()
 
-    def gram_matrix(features):
+    def gram_matrix(self, features):
         batch_size, num_channels, height, width = features.size()
         features = features.view(batch_size * num_channels, height * width)
         gram = torch.mm(features, features.t())
