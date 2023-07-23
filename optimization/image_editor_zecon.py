@@ -290,9 +290,9 @@ class ImageEditor:
                   '28': 'conv5_1',
                   '31': 'conv5_2'
                   }
-        for key, values in layers:
-            target_gram = self.gram_matrix(target_features[values])
-            content_gram = self.gram_matrix(content_features[values])
+        for key in layers:
+            target_gram = self.gram_matrix(target_features[layers[key]])
+            content_gram = self.gram_matrix(content_features[layers[key]])
             loss += torch.mean((target_gram - content_gram) ** 2)
         print(loss.shape())
         return loss
@@ -906,7 +906,7 @@ class ImageEditor:
                 loss = torch.tensor(0)
                 if self.args.l_clip_global_patch != 0:
                     vgg_loss = self.vgg_loss_feature(
-                        x_in, self.style_image) * self.args.l_clip_global_patch/250
+                        x_in, self.style_image) * self.args.l_clip_global_patch/500
                     loss = loss + vgg_loss
                     self.metrics_accumulator.update_metric(
                         "vgg_loss_feature : ", vgg_loss.item())
