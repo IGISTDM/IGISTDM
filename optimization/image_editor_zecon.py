@@ -288,23 +288,23 @@ class ImageEditor:
                  }  
         '''
         loss += torch.mean((target_features['conv1_1'] -
-                           content_features['conv1_1']) ** 2)
+                           content_features['conv1_1']) ** 2)/100
         loss += torch.mean((target_features['conv1_2'] -
-                           content_features['conv1_2']) ** 2)
+                           content_features['conv1_2']) ** 2)/100
         loss += torch.mean((target_features['conv2_1'] -
-                           content_features['conv2_1']) ** 2)
+                           content_features['conv2_1']) ** 2)/100
         loss += torch.mean((target_features['conv2_2'] -
-                           content_features['conv2_2']) ** 2)
+                           content_features['conv2_2']) ** 2)/100
         loss += torch.mean((target_features['conv3_1'] -
-                           content_features['conv3_1']) ** 2)
+                           content_features['conv3_1']) ** 2)/100
         loss += torch.mean((target_features['conv4_1'] -
-                           content_features['conv4_1']) ** 2)
+                           content_features['conv4_1']) ** 2)/100
         loss += torch.mean((target_features['conv4_2'] -
-                           content_features['conv4_2']) ** 2)
+                           content_features['conv4_2']) ** 2)/100
         loss += torch.mean((target_features['conv5_1'] -
-                           content_features['conv5_1']) ** 2)
+                           content_features['conv5_1']) ** 2)/100
         loss += torch.mean((target_features['conv5_2'] -
-                           content_features['conv5_2']) ** 2)
+                           content_features['conv5_2']) ** 2)/100
 
         return loss.mean()
 
