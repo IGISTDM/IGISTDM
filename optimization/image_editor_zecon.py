@@ -294,7 +294,6 @@ class ImageEditor:
             target_gram = self.gram_matrix(target_features[layers[key]])
             content_gram = self.gram_matrix(content_features[layers[key]])
             loss += torch.mean((target_gram - content_gram) ** 2)
-        print(loss.shape())
         return loss
 
     def vgg_loss_feature(self, x_in, y_in):
