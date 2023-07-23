@@ -379,7 +379,7 @@ class ImageEditor:
             ).float()
 
             axs[0, 1].imshow(self.saved_image["text"][i])
-            axs[0, 1].set_title('prompt')
+            axs[0, 1].set_title('vgg mse')
             axs[0, 1].set_xlabel('CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}'.format(
                 self.clip_global_loss(image, text), self.clip_global_loss_feature(image, self.style_image)))
 
@@ -390,7 +390,7 @@ class ImageEditor:
             )
 
             axs[1, 0].imshow(self.saved_image["image"][i])
-            axs[1, 0].set_title('image')
+            axs[1, 0].set_title('clip score')
             axs[1, 0].set_xlabel('CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}'.format(
                 self.clip_global_loss(image, text), self.clip_global_loss_feature(image, self.style_image)))
 
@@ -399,7 +399,7 @@ class ImageEditor:
                 self.device).unsqueeze(0).mul(2).sub(1))
 
             axs[1, 1].imshow(self.saved_image["image+text"][i])
-            axs[1, 1].set_title('image+prompt')
+            axs[1, 1].set_title('vgg_gram matrix mse')
             axs[1, 1].set_xlabel('CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}'.format(
                 self.clip_global_loss(image, text), self.clip_global_loss_feature(image, self.style_image)))
 
@@ -463,14 +463,6 @@ class ImageEditor:
 
                 loss = torch.tensor(0)
 
-                if self.args.l_clip_global_patch != 0:
-                    vgg_loss = self.vgg_loss_feature(
-                        x_in, self.style_image) * self.args.l_clip_global_patch/250
-                    loss = loss + vgg_loss
-                    self.metrics_accumulator.update_metric(
-                        "vgg_loss_feature : ", vgg_loss.item())
-
-                '''
                 if self.args.l_clip_global != 0:
                     clip_loss = self.clip_global_loss_feature(
                         x_in, self.style_image) * self.args.l_clip_global
@@ -494,7 +486,7 @@ class ImageEditor:
                     loss = loss + clip_dir_patch_loss_feature
                     self.metrics_accumulator.update_metric(
                         "clip_dir_patch_loss_feature", clip_dir_patch_loss_feature.item())
-                '''
+
                 if self.args.l_zecon != 0:
                     y_t = self.diffusion.q_sample(self.init_image, t)
                     y_in = self.init_image * fac + y_t * (1 - fac)
@@ -680,6 +672,13 @@ class ImageEditor:
 
                 loss = torch.tensor(0)
 
+                if self.args.l_clip_global_patch != 0:
+                    vgg_loss = self.vgg_loss_feature_gram(
+                        x_in, self.style_image) * self.args.l_clip_global_patch/250
+                    loss = loss + vgg_loss
+                    self.metrics_accumulator.update_metric(
+                        "vgg_loss_feature_gram : ", vgg_loss.item())
+                '''
                 # prompt loss
                 if self.args.l_clip_global != 0:
                     clip_loss = (self.clip_global_loss(
@@ -717,6 +716,7 @@ class ImageEditor:
                     loss = loss + clip_dir_patch_loss
                     self.metrics_accumulator.update_metric(
                         "clip_dir_patch_loss", clip_dir_patch_loss.item())
+                '''
 
                 if self.args.l_zecon != 0:
                     y_t = self.diffusion.q_sample(self.init_image, t)
@@ -904,6 +904,13 @@ class ImageEditor:
                 x_in = out["pred_xstart"] * fac + x * (1 - fac)
 
                 loss = torch.tensor(0)
+                if self.args.l_clip_global_patch != 0:
+                    vgg_loss = self.vgg_loss_feature(
+                        x_in, self.style_image) * self.args.l_clip_global_patch/250
+                    loss = loss + vgg_loss
+                    self.metrics_accumulator.update_metric(
+                        "vgg_loss_feature : ", vgg_loss.item())
+                '''
                 if self.args.l_clip_global != 0:
                     clip_loss = self.clip_global_loss(
                         x_in, text_embed) * self.args.l_clip_global
@@ -937,6 +944,7 @@ class ImageEditor:
                     loss = loss + clip_dir_patch_loss
                     self.metrics_accumulator.update_metric(
                         "clip_dir_patch_loss", clip_dir_patch_loss.item())
+                '''
 
                 if self.args.l_zecon != 0:
                     y_t = self.diffusion.q_sample(self.init_image, t)
