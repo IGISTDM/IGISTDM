@@ -411,7 +411,7 @@ class ImageEditor:
 
                 loss = torch.tensor(0)
 
-                if self.args.l_clip_global != 0:
+                if self.args.l_clip_global_patch != 0:
                     vgg_loss = self.vgg_loss(
                         x_in, self.style_image) * self.args.l_clip_global
                     loss = loss + vgg_loss
