@@ -275,10 +275,36 @@ class ImageEditor:
         target_features = get_features(self.vgg_normalize(y_in), self.vgg)
         feature = target_features - content_features
         loss = 0
-        # for key, value in loss.items():
-        #     loss[key]=value**2
-        for key, value in feature.items():
-            loss += torch.mean(value)
+        '''
+        layers = {'0': 'conv1_1', 
+                  '2': 'conv1_2', 
+                  '5': 'conv2_1',  
+                  '7': 'conv2_2',
+                  '10': 'conv3_1', 
+                  '19': 'conv4_1', 
+                  '21': 'conv4_2', 
+                  '28': 'conv5_1',
+                  '31': 'conv5_2'
+                 }  
+        '''
+        loss += torch.mean((target_features['conv1_1'] -
+                           content_features['conv1_1']) ** 2)
+        loss += torch.mean((target_features['conv1_2'] -
+                           content_features['conv1_2']) ** 2)
+        loss += torch.mean((target_features['conv2_1'] -
+                           content_features['conv2_1']) ** 2)
+        loss += torch.mean((target_features['conv2_2'] -
+                           content_features['conv2_2']) ** 2)
+        loss += torch.mean((target_features['conv3_1'] -
+                           content_features['conv3_1']) ** 2)
+        loss += torch.mean((target_features['conv4_1'] -
+                           content_features['conv4_1']) ** 2)
+        loss += torch.mean((target_features['conv4_2'] -
+                           content_features['conv4_2']) ** 2)
+        loss += torch.mean((target_features['conv5_1'] -
+                           content_features['conv5_1']) ** 2)
+        loss += torch.mean((target_features['conv5_2'] -
+                           content_features['conv5_2']) ** 2)
 
         return loss.mean()
 
