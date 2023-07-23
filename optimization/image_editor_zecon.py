@@ -413,7 +413,7 @@ class ImageEditor:
 
                 if self.args.l_clip_global_patch != 0:
                     vgg_loss = self.vgg_loss(
-                        x_in, self.style_image) * self.args.l_clip_global
+                        x_in, self.style_image) * self.args.l_clip_global_patch
                     loss = loss + vgg_loss
                     self.metrics_accumulator.update_metric(
                         "vgg_loss_feature : ", vgg_loss.item())
