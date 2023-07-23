@@ -270,10 +270,35 @@ class ImageEditor:
                            content_features['conv2_1']) ** 2)
         return loss.mean()
 
+    def gram_matrix(features):
+        batch_size, num_channels, height, width = features.size()
+        features = features.view(batch_size * num_channels, height * width)
+        gram = torch.mm(features, features.t())
+        return gram.div(batch_size * num_channels * height * width)
+
+    def vgg_loss_feature_gram(self, x_in, y_in):
+        content_features = get_features(self.vgg_normalize(x_in), self.vgg)
+        target_features = get_features(self.vgg_normalize(y_in), self.vgg)
+        loss = 0.0
+        layers = {'0': 'conv1_1',
+                  '2': 'conv1_2',
+                  '5': 'conv2_1',
+                  '7': 'conv2_2',
+                  '10': 'conv3_1',
+                  '19': 'conv4_1',
+                  '21': 'conv4_2',
+                  '28': 'conv5_1',
+                  '31': 'conv5_2'
+                  }
+        for key, values in layers:
+            target_gram = self.gram_matrix(target_features[values])
+            content_gram = self.gram_matrix(content_features[values])
+            loss += torch.mean((target_gram - content_gram) ** 2)
+        return loss
+
     def vgg_loss_feature(self, x_in, y_in):
         content_features = get_features(self.vgg_normalize(x_in), self.vgg)
         target_features = get_features(self.vgg_normalize(y_in), self.vgg)
-        feature = target_features - content_features
         loss = 0
         '''
         layers = {'0': 'conv1_1', 
