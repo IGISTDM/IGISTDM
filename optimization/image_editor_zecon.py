@@ -905,7 +905,7 @@ class ImageEditor:
                 loss = torch.tensor(0)
                 if self.args.l_clip_global_patch != 0:
                     vgg_loss = self.vgg_loss_feature(
-                        x_in, self.style_image) * self.args.l_clip_global_patch/250
+                        x_in, self.style_image) * self.args.l_clip_global_patch/125
                     loss = loss + vgg_loss
                     self.metrics_accumulator.update_metric(
                         "vgg_loss_feature : ", vgg_loss.item())
