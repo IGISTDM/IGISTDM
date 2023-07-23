@@ -268,31 +268,17 @@ class ImageEditor:
                            content_features['conv1_1']) ** 2)
         loss += torch.mean((target_features['conv2_1'] -
                            content_features['conv2_1']) ** 2)
-        # loss += torch.mean((target_features['conv4_2'] - content_features['conv4_2']) ** 2)
-        # loss += torch.mean((target_features['conv5_2'] - content_features['conv5_2']) ** 2)
-
         return loss.mean()
 
     def vgg_loss_feature(self, x_in, y_in):
         content_features = get_features(self.vgg_normalize(x_in), self.vgg)
         target_features = get_features(self.vgg_normalize(y_in), self.vgg)
+        feature = target_features - content_features
         loss = 0
-
-        loss += torch.mean((target_features['conv4_2'] -
-                           content_features['conv4_2']) ** 2)
-        loss += torch.mean((target_features['conv5_2'] -
-                           content_features['conv5_2']) ** 2)
-        print("loss.mean()", loss.mean())
-        return loss.mean()
-
-    def vgg_loss_dir_feature(self, x_in, y_in, style_image, text_y_embed):
-        x_features = get_features(self.vgg_normalize(x_in), self.vgg)
-        y_features = get_features(self.vgg_normalize(y_in), self.vgg)
-        style_features = get_features(
-            self.vgg_normalize(style_image), self.vgg)
-        text_features = get_features(
-            self.vgg_normalize(text_y_embed), self.vgg)
-        loss = 0
+        # for key, value in loss.items():
+        #     loss[key]=value**2
+        for key, value in feature.items():
+            loss += torch.mean(value)
 
         return loss.mean()
 
@@ -424,6 +410,15 @@ class ImageEditor:
                 x_in = out["pred_xstart"] * fac + x * (1 - fac)\
 
                 loss = torch.tensor(0)
+
+                if self.args.l_clip_global != 0:
+                    vgg_loss = self.vgg_loss(
+                        x_in, self.style_image) * self.args.l_clip_global
+                    loss = loss + vgg_loss
+                    self.metrics_accumulator.update_metric(
+                        "vgg_loss_feature : ", vgg_loss.item())
+
+                '''
                 if self.args.l_clip_global != 0:
                     clip_loss = self.clip_global_loss_feature(
                         x_in, self.style_image) * self.args.l_clip_global
@@ -447,7 +442,7 @@ class ImageEditor:
                     loss = loss + clip_dir_patch_loss_feature
                     self.metrics_accumulator.update_metric(
                         "clip_dir_patch_loss_feature", clip_dir_patch_loss_feature.item())
-
+                '''
                 if self.args.l_zecon != 0:
                     y_t = self.diffusion.q_sample(self.init_image, t)
                     y_in = self.init_image * fac + y_t * (1 - fac)
