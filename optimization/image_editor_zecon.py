@@ -301,16 +301,16 @@ class ImageEditor:
         target_features = get_features(self.vgg_normalize(y_in), self.vgg)
         loss = 0
         '''
-        layers = {'0': 'conv1_1', 
-                  '2': 'conv1_2', 
-                  '5': 'conv2_1',  
+        layers = {'0': 'conv1_1',
+                  '2': 'conv1_2',
+                  '5': 'conv2_1',
                   '7': 'conv2_2',
-                  '10': 'conv3_1', 
-                  '19': 'conv4_1', 
-                  '21': 'conv4_2', 
+                  '10': 'conv3_1',
+                  '19': 'conv4_1',
+                  '21': 'conv4_2',
                   '28': 'conv5_1',
                   '31': 'conv5_2'
-                 }  
+                 }
         '''
         loss += torch.mean((target_features['conv1_1'] -
                            content_features['conv1_1']) ** 2)
@@ -361,6 +361,17 @@ class ImageEditor:
             image_embeds_y = self.clip_model.encode_image(clip_in_y).float()
         return d_clip_loss(image_embeds_x, image_embeds_y, use_cosine=True)
         '''
+    def append_lines_to_txt_file(file_path, lines_to_append):
+        try:
+            with open(file_path, 'r') as file:
+                content = file.read()
+            content += '\n'
+            content += '\n'.join(lines_to_append)
+
+            with open(file_path, 'w') as file:
+                file.write(content)
+        except IOError:
+            pass
 
     def save_image(self):
         output_len = len(str(len(self.saved_image["text"])))
@@ -376,31 +387,48 @@ class ImageEditor:
             text = self.clip_model.encode_text(
                 clip.tokenize(self.args.prompt_tgt).to(self.device)
             ).float()
+            a = self.clip_global_loss(image, text)
+            b = self.clip_global_loss_feature(image, self.style_image)
+            c = self.vgg_loss_feature_gram(image, self.style_image)
 
             axs[0, 1].imshow(self.saved_image["text"][i])
             axs[0, 1].set_title('clip + gram')
-            axs[0, 1].set_xlabel('CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(
-                self.clip_global_loss(image, text), self.clip_global_loss_feature(image, self.style_image), self.vgg_loss_feature_gram(image, self.style_image)))
+            axs[0, 1].set_xlabel(
+                'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
+            file_path = "./score_hybrid.txt"
+            lines_to_add = [str(a), str(b), str(c)]
+            self.append_lines_to_txt_file(file_path, lines_to_add)
 
             image = self.saved_image["image"][i]
             image = (
                 TF.to_tensor(image).to(
                     self.device).unsqueeze(0).mul(2).sub(1)
             )
-
+            a = self.clip_global_loss(image, text)
+            b = self.clip_global_loss_feature(image, self.style_image)
+            c = self.vgg_loss_feature_gram(image, self.style_image)
             axs[1, 0].imshow(self.saved_image["image"][i])
             axs[1, 0].set_title('clip score')
-            axs[1, 0].set_xlabel('CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(
-                self.clip_global_loss(image, text), self.clip_global_loss_feature(image, self.style_image), self.vgg_loss_feature_gram(image, self.style_image)))
+            axs[1, 0].set_xlabel(
+                'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
+            file_path = "./score_clip.txt"
+            lines_to_add = [str(a), str(b), str(c)]
+            self.append_lines_to_txt_file(file_path, lines_to_add)
 
             image = self.saved_image["image+text"][i]
             image = (TF.to_tensor(image).to(
                 self.device).unsqueeze(0).mul(2).sub(1))
 
+            a = self.clip_global_loss(image, text)
+            b = self.clip_global_loss_feature(image, self.style_image)
+            c = self.vgg_loss_feature_gram(image, self.style_image)
             axs[1, 1].imshow(self.saved_image["image+text"][i])
             axs[1, 1].set_title('vgg_gram matrix mse')
-            axs[1, 1].set_xlabel('CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(
-                self.clip_global_loss(image, text), self.clip_global_loss_feature(image, self.style_image), self.vgg_loss_feature_gram(image, self.style_image)))
+            axs[1, 1].set_xlabel(
+                'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
+            file_path = "./score_gram.txt"
+            lines_to_add = [str(a), str(b), str(c)]
+            self.append_lines_to_txt_file(file_path, lines_to_add)
 
             # 調整子圖間距
             plt.tight_layout()
@@ -622,7 +650,7 @@ class ImageEditor:
                                 edited_image=pred_image_pil,
                                 # mask=self.style_image_pil,
                                 path=visualization_path,
-                                #distance=f"{self.get_clip_score_image(self.init_image, self.style_image):.3f}"
+                                # distance=f"{self.get_clip_score_image(self.init_image, self.style_image):.3f}"
                             )
                             '''
 
@@ -630,7 +658,7 @@ class ImageEditor:
                                 visualization_path).replace('.png', '_output_image.png')
                             pred_image_arr = np.array(pred_image_pil)
                             self.saved_image["image"].append(pred_image_arr)
-                            #plt.imsave(visualization_path2, pred_image_arr)
+                            # plt.imsave(visualization_path2, pred_image_arr)
 
     def edit_image_by_image_prompt(self):
 
@@ -863,7 +891,7 @@ class ImageEditor:
                             pred_image_arr = np.array(pred_image_pil)
                             self.saved_image["image+text"].append(
                                 pred_image_arr)
-                            #plt.imsave(visualization_path2, pred_image_arr)
+                            # plt.imsave(visualization_path2, pred_image_arr)
 
     def edit_image_by_prompt(self):
 
@@ -1102,4 +1130,4 @@ class ImageEditor:
                                 visualization_path).replace('.png', '_output_promet.png')
                             pred_image_arr = np.array(pred_image_pil)
                             self.saved_image["text"].append(pred_image_arr)
-                            #plt.imsave(visualization_path2, pred_image_arr)
+                            # plt.imsave(visualization_path2, pred_image_arr)
