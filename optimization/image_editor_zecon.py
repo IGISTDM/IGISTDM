@@ -398,7 +398,8 @@ class ImageEditor:
                 'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
             file_path = "./score_hybrid.txt"
             lines_to_add = [str(a), str(b), str(c)]
-            self.append_lines_to_txt_file(file_path, lines_to_add)
+            if i == output_len - 1:
+                self.append_lines_to_txt_file(file_path, lines_to_add)
 
             image = self.saved_image["image"][i]
             image = (
@@ -414,8 +415,8 @@ class ImageEditor:
                 'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
             file_path = "./score_clip.txt"
             lines_to_add = [str(a), str(b), str(c)]
-            self.append_lines_to_txt_file(file_path, lines_to_add)
-
+            if i == output_len - 1:
+                self.append_lines_to_txt_file(file_path, lines_to_add)
             image = self.saved_image["image+text"][i]
             image = (TF.to_tensor(image).to(
                 self.device).unsqueeze(0).mul(2).sub(1))
@@ -429,7 +430,8 @@ class ImageEditor:
                 'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
             file_path = "./score_gram.txt"
             lines_to_add = [str(a), str(b), str(c)]
-            self.append_lines_to_txt_file(file_path, lines_to_add)
+            if i == output_len - 1:
+                self.append_lines_to_txt_file(file_path, lines_to_add)
 
             # 調整子圖間距
             plt.tight_layout()
