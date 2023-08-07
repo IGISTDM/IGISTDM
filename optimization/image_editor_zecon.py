@@ -379,8 +379,8 @@ class ImageEditor:
 
             axs[0, 1].imshow(self.saved_image["text"][i])
             axs[0, 1].set_title('clip + gram')
-            axs[0, 1].set_xlabel('CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}'.format(
-                self.clip_global_loss(image, text), self.clip_global_loss_feature(image, self.style_image)))
+            axs[0, 1].set_xlabel('CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(
+                self.clip_global_loss(image, text), self.clip_global_loss_feature(image, self.style_image), self.vgg_loss_feature_gram(image, self.style_image)))
 
             image = self.saved_image["image"][i]
             image = (
@@ -390,8 +390,8 @@ class ImageEditor:
 
             axs[1, 0].imshow(self.saved_image["image"][i])
             axs[1, 0].set_title('clip score')
-            axs[1, 0].set_xlabel('CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}'.format(
-                self.clip_global_loss(image, text), self.clip_global_loss_feature(image, self.style_image)))
+            axs[1, 0].set_xlabel('CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(
+                self.clip_global_loss(image, text), self.clip_global_loss_feature(image, self.style_image), self.vgg_loss_feature_gram(image, self.style_image)))
 
             image = self.saved_image["image+text"][i]
             image = (TF.to_tensor(image).to(
@@ -399,8 +399,8 @@ class ImageEditor:
 
             axs[1, 1].imshow(self.saved_image["image+text"][i])
             axs[1, 1].set_title('vgg_gram matrix mse')
-            axs[1, 1].set_xlabel('CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}'.format(
-                self.clip_global_loss(image, text), self.clip_global_loss_feature(image, self.style_image)))
+            axs[1, 1].set_xlabel('CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(
+                self.clip_global_loss(image, text), self.clip_global_loss_feature(image, self.style_image), self.vgg_loss_feature_gram(image, self.style_image)))
 
             # 調整子圖間距
             plt.tight_layout()
