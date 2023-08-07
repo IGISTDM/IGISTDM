@@ -361,7 +361,8 @@ class ImageEditor:
             image_embeds_y = self.clip_model.encode_image(clip_in_y).float()
         return d_clip_loss(image_embeds_x, image_embeds_y, use_cosine=True)
         '''
-    def append_lines_to_txt_file(file_path, lines_to_append):
+
+    def append_lines_to_txt_file(self, file_path, lines_to_append):
         try:
             with open(file_path, 'r') as file:
                 content = file.read()
