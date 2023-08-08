@@ -446,13 +446,13 @@ class ImageEditor:
             )
             plt.savefig(visualization_path)
             visualization_path_text = str(
-                visualization_path).replace('.png', '_text_{}.png'.format(i))
+                visualization_path).replace('.png', '_clip_gram_{}.png'.format(i))
 
             visualization_path_image = str(
-                visualization_path).replace('.png', '_image_{}.png'.format(i))
+                visualization_path).replace('.png', '_clip_{}.png'.format(i))
 
             visualization_path_image_text = str(
-                visualization_path).replace('.png', '_text_image_{}.png'.format(i))
+                visualization_path).replace('.png', '_gram_{}.png'.format(i))
 
             plt.imsave(visualization_path_text, self.saved_image["text"][i])
             plt.imsave(visualization_path_image, self.saved_image["image"][i])
