@@ -398,7 +398,7 @@ class ImageEditor:
                 'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
             file_path = "./score_hybrid.txt"
             lines_to_add = [str(a), str(b), str(c)]
-            if i == output_len - 1:
+            if i == 0:
                 self.append_lines_to_txt_file(file_path, lines_to_add)
 
             image = self.saved_image["image"][i]
@@ -415,7 +415,7 @@ class ImageEditor:
                 'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
             file_path = "./score_clip.txt"
             lines_to_add = [str(a), str(b), str(c)]
-            if i == output_len - 1:
+            if i == 0:
                 self.append_lines_to_txt_file(file_path, lines_to_add)
             image = self.saved_image["image+text"][i]
             image = (TF.to_tensor(image).to(
@@ -430,7 +430,7 @@ class ImageEditor:
                 'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
             file_path = "./score_gram.txt"
             lines_to_add = [str(a), str(b), str(c)]
-            if i == output_len - 1:
+            if i == 0:
                 self.append_lines_to_txt_file(file_path, lines_to_add)
 
             # 調整子圖間距
