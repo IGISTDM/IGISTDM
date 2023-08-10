@@ -123,7 +123,19 @@ class ImageEditor:
             TF.to_tensor(style_image).to(
                 self.device).unsqueeze(0).mul(2).sub(1)
         )
+
+        # name rule : method_loss name
         self.style_image = style_image
+        self.matrix = {}
+        self.matrix["clip_prompt"] = []
+        self.matrix["clip_image"] = []
+        self.matrix["clip_gram"] = []
+        self.matrix["gram_prompt"] = []
+        self.matrix["gram_image"] = []
+        self.matrix["gram_gram"] = []
+        self.matrix["hybrid_prompt"] = []
+        self.matrix["hybrid_image"] = []
+        self.matrix["hybrid_gram"] = []
 
     def unscale_timestep(self, t):
         unscaled_timestep = (t * (self.diffusion.num_timesteps / 1000)).long()
@@ -362,18 +374,6 @@ class ImageEditor:
         return d_clip_loss(image_embeds_x, image_embeds_y, use_cosine=True)
         '''
 
-    def append_lines_to_txt_file(self, file_path, lines_to_append):
-        try:
-            with open(file_path, 'r') as file:
-                content = file.read()
-            content += '\n'
-            content += '\n'.join(lines_to_append)
-
-            with open(file_path, 'w') as file:
-                file.write(content)
-        except IOError:
-            pass
-
     def save_image(self):
         output_len = len(str(len(self.saved_image["text"])))
         for i in range(len(self.saved_image["text"])):
@@ -396,10 +396,10 @@ class ImageEditor:
             axs[0, 1].set_title('clip + gram')
             axs[0, 1].set_xlabel(
                 'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
-            file_path = "./score_hybrid.txt"
-            lines_to_add = [str(a), str(b), str(c)]
-            if i == 0:
-                self.append_lines_to_txt_file(file_path, lines_to_add)
+
+            self.matrix["hybrid_prompt"].append(a)
+            self.matrix["hybrid_image"].append(b)
+            self.matrix["hybrid_gram"].append(c)
 
             image = self.saved_image["image"][i]
             image = (
@@ -413,10 +413,11 @@ class ImageEditor:
             axs[1, 0].set_title('clip score')
             axs[1, 0].set_xlabel(
                 'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
-            file_path = "./score_clip.txt"
-            lines_to_add = [str(a), str(b), str(c)]
-            if i == 0:
-                self.append_lines_to_txt_file(file_path, lines_to_add)
+
+            self.matrix["clip_prompt"].append(a)
+            self.matrix["clip_image"].append(b)
+            self.matrix["clip_gram"].append(c)
+
             image = self.saved_image["image+text"][i]
             image = (TF.to_tensor(image).to(
                 self.device).unsqueeze(0).mul(2).sub(1))
@@ -428,10 +429,10 @@ class ImageEditor:
             axs[1, 1].set_title('vgg_gram matrix mse')
             axs[1, 1].set_xlabel(
                 'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
-            file_path = "./score_gram.txt"
-            lines_to_add = [str(a), str(b), str(c)]
-            if i == 0:
-                self.append_lines_to_txt_file(file_path, lines_to_add)
+
+            self.matrix["gram_prompt"].append(a)
+            self.matrix["gram_image"].append(b)
+            self.matrix["gram_gram"].append(c)
 
             # 調整子圖間距
             plt.tight_layout()
