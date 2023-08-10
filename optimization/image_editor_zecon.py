@@ -397,9 +397,10 @@ class ImageEditor:
             axs[0, 1].set_xlabel(
                 'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
 
-            self.matrix["hybrid_prompt"].append(a)
-            self.matrix["hybrid_image"].append(b)
-            self.matrix["hybrid_gram"].append(c)
+            if i == 0:
+                self.matrix["hybrid_prompt"].append(float(a))
+                self.matrix["hybrid_image"].append(float(b))
+                self.matrix["hybrid_gram"].append(float(c))
 
             image = self.saved_image["image"][i]
             image = (
@@ -414,9 +415,10 @@ class ImageEditor:
             axs[1, 0].set_xlabel(
                 'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
 
-            self.matrix["clip_prompt"].append(a)
-            self.matrix["clip_image"].append(b)
-            self.matrix["clip_gram"].append(c)
+            if i == 0:
+                self.matrix["clip_prompt"].append(float(a))
+                self.matrix["clip_image"].append(float(b))
+                self.matrix["clip_gram"].append(float(c))
 
             image = self.saved_image["image+text"][i]
             image = (TF.to_tensor(image).to(
@@ -430,9 +432,10 @@ class ImageEditor:
             axs[1, 1].set_xlabel(
                 'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
 
-            self.matrix["gram_prompt"].append(a)
-            self.matrix["gram_image"].append(b)
-            self.matrix["gram_gram"].append(c)
+            if i == 0:
+                self.matrix["gram_prompt"].append(float(a))
+                self.matrix["gram_image"].append(float(b))
+                self.matrix["gram_gram"].append(float(c))
 
             # 調整子圖間距
             plt.tight_layout()
