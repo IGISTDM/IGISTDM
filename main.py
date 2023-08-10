@@ -19,7 +19,7 @@ if __name__ == "__main__":
     style = args.ref_image
     folder_path = './src_image/{}'.format(style)
     for filename in os.listdir(folder_path):
-        args["ref_image"] = "./src_image/{}/{}".format(style, filename)
+        args.ref_image = "./src_image/{}/{}".format(style, filename)
         image_editor = ImageEditor(args)
         image_editor.edit_image_by_image_prompt()
         torch.cuda.empty_cache()
