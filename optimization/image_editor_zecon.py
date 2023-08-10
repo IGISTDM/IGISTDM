@@ -898,7 +898,7 @@ class ImageEditor:
                                 visualization_path).replace('.png', '_output_promet.png')
                             pred_image_arr = np.array(pred_image_pil)
         self.saved_image["image+text"].append(pred_image_arr)
-                            # plt.imsave(visualization_path2, pred_image_arr)
+        # plt.imsave(visualization_path2, pred_image_arr)
 
     def edit_image_by_prompt(self):
 
@@ -1137,4 +1137,4 @@ class ImageEditor:
                                 visualization_path).replace('.png', '_output_promet.png')
                             pred_image_arr = np.array(pred_image_pil)
         self.saved_image["text"].append(pred_image_arr)
-                            # plt.imsave(visualization_path2, pred_image_arr)
+        # plt.imsave(visualization_path2, pred_image_arr)
