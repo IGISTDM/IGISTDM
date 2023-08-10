@@ -397,7 +397,7 @@ class ImageEditor:
             axs[0, 1].set_xlabel(
                 'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
 
-            if i == 0:
+            if i == output_len-1:
                 self.matrix["hybrid_prompt"].append(float(a))
                 self.matrix["hybrid_image"].append(float(b))
                 self.matrix["hybrid_gram"].append(float(c))
@@ -415,7 +415,7 @@ class ImageEditor:
             axs[1, 0].set_xlabel(
                 'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
 
-            if i == 0:
+            if i == output_len-1:
                 self.matrix["clip_prompt"].append(float(a))
                 self.matrix["clip_image"].append(float(b))
                 self.matrix["clip_gram"].append(float(c))
@@ -432,7 +432,7 @@ class ImageEditor:
             axs[1, 1].set_xlabel(
                 'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
 
-            if i == 0:
+            if i == output_len-1:
                 self.matrix["gram_prompt"].append(float(a))
                 self.matrix["gram_image"].append(float(b))
                 self.matrix["gram_gram"].append(float(c))
