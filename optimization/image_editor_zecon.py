@@ -558,6 +558,7 @@ class ImageEditor:
                 return -torch.autograd.grad(loss, x)[0]
 
         save_image_interval = self.diffusion.num_timesteps // 5
+        pred_image_arr = 0
         for iteration_number in range(self.args.iterations_num):
             fw = self.args.diffusion_type.split('_')[0]
             bk = self.args.diffusion_type.split('_')[-1]
@@ -664,8 +665,8 @@ class ImageEditor:
                             visualization_path2 = str(
                                 visualization_path).replace('.png', '_output_image.png')
                             pred_image_arr = np.array(pred_image_pil)
-                            self.saved_image["image"].append(pred_image_arr)
                             # plt.imsave(visualization_path2, pred_image_arr)
+        self.saved_image["image"].append(pred_image_arr)
 
     def edit_image_by_image_prompt(self):
 
@@ -896,8 +897,7 @@ class ImageEditor:
                             visualization_path2 = str(
                                 visualization_path).replace('.png', '_output_promet.png')
                             pred_image_arr = np.array(pred_image_pil)
-                            self.saved_image["image+text"].append(
-                                pred_image_arr)
+        self.saved_image["image+text"].append(pred_image_arr)
                             # plt.imsave(visualization_path2, pred_image_arr)
 
     def edit_image_by_prompt(self):
@@ -1136,5 +1136,5 @@ class ImageEditor:
                             visualization_path2 = str(
                                 visualization_path).replace('.png', '_output_promet.png')
                             pred_image_arr = np.array(pred_image_pil)
-                            self.saved_image["text"].append(pred_image_arr)
+        self.saved_image["text"].append(pred_image_arr)
                             # plt.imsave(visualization_path2, pred_image_arr)
