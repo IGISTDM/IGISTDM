@@ -36,6 +36,6 @@ if __name__ == "__main__":
         matrix["hybrid_prompt"].append(image_editor.matrix["hybrid_prompt"][0])
         matrix["hybrid_gram"].append(image_editor.matrix["hybrid_gram"][0])
         matrix["hybrid_image"].append(image_editor.matrix["hybrid_image"][0])
-    file_path = 'matrix.pickle'
+    file_path = 'matrix_{}.pickle'.foramt(style)
     with open(file_path, 'wb') as file:
         pickle.dump(matrix, file)
