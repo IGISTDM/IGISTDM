@@ -377,78 +377,88 @@ class ImageEditor:
     def save_image(self):
         output_len = len(str(len(self.saved_image["text"])))
         for i in range(len(self.saved_image["text"])):
+            visualization_path = visualization_path = Path(
+                os.path.join(self.args.output_path, self.args.output_file)
+            )
             fig, axs = plt.subplots(2, 2, figsize=(10, 8))
 
             axs[0, 0].imshow(self.style_image_pil)
             axs[0, 0].set_title("prompt : " + self.args.prompt_tgt)
 
-            image = self.saved_image["text"][i]
-            image = (TF.to_tensor(image).to(
-                self.device).unsqueeze(0).mul(2).sub(1))
-            text = self.clip_model.encode_text(
-                clip.tokenize(self.args.prompt_tgt).to(self.device)
-            ).float()
-            a = self.clip_global_loss(image, text)
-            b = self.clip_global_loss_feature(image, self.style_image)
-            c = self.vgg_loss_feature_gram(image, self.style_image)
+            try:
+                image = self.saved_image["text"][i]
+                image = (TF.to_tensor(image).to(
+                    self.device).unsqueeze(0).mul(2).sub(1))
+                text = self.clip_model.encode_text(
+                    clip.tokenize(self.args.prompt_tgt).to(self.device)
+                ).float()
+                a = self.clip_global_loss(image, text)
+                b = self.clip_global_loss_feature(image, self.style_image)
+                c = self.vgg_loss_feature_gram(image, self.style_image)
 
-            axs[0, 1].imshow(self.saved_image["text"][i])
-            axs[0, 1].set_title('clip + gram')
-            axs[0, 1].set_xlabel(
-                'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
+                axs[0, 1].imshow(self.saved_image["text"][i])
+                axs[0, 1].set_title('clip + gram')
+                axs[0, 1].set_xlabel(
+                    'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
 
-            if i == output_len-1:
-                self.matrix["hybrid_prompt"].append(float(a))
-                self.matrix["hybrid_image"].append(float(b))
-                self.matrix["hybrid_gram"].append(float(c))
+                if i == output_len-1:
+                    self.matrix["hybrid_prompt"].append(float(a))
+                    self.matrix["hybrid_image"].append(float(b))
+                    self.matrix["hybrid_gram"].append(float(c))
+            except:
+                pass
 
-            image = self.saved_image["image"][i]
-            image = (
-                TF.to_tensor(image).to(
-                    self.device).unsqueeze(0).mul(2).sub(1)
-            )
-            a = self.clip_global_loss(image, text)
-            b = self.clip_global_loss_feature(image, self.style_image)
-            c = self.vgg_loss_feature_gram(image, self.style_image)
-            axs[1, 0].imshow(self.saved_image["image"][i])
-            axs[1, 0].set_title('clip score')
-            axs[1, 0].set_xlabel(
-                'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
+            try:
+                image = self.saved_image["image"][i]
+                image = (
+                    TF.to_tensor(image).to(
+                        self.device).unsqueeze(0).mul(2).sub(1)
+                )
+                a = self.clip_global_loss(image, text)
+                b = self.clip_global_loss_feature(image, self.style_image)
+                c = self.vgg_loss_feature_gram(image, self.style_image)
+                axs[1, 0].imshow(self.saved_image["image"][i])
+                axs[1, 0].set_title('clip score')
+                axs[1, 0].set_xlabel(
+                    'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
 
-            if i == output_len-1:
-                self.matrix["clip_prompt"].append(float(a))
-                self.matrix["clip_image"].append(float(b))
-                self.matrix["clip_gram"].append(float(c))
+                if i == output_len-1:
+                    self.matrix["clip_prompt"].append(float(a))
+                    self.matrix["clip_image"].append(float(b))
+                    self.matrix["clip_gram"].append(float(c))
+            except:
+                pass
 
-            image = self.saved_image["image+text"][i]
-            image = (TF.to_tensor(image).to(
-                self.device).unsqueeze(0).mul(2).sub(1))
+            try:
+                image = self.saved_image["image+text"][i]
+                image = (TF.to_tensor(image).to(
+                    self.device).unsqueeze(0).mul(2).sub(1))
 
-            a = self.clip_global_loss(image, text)
-            b = self.clip_global_loss_feature(image, self.style_image)
-            c = self.vgg_loss_feature_gram(image, self.style_image)
-            axs[1, 1].imshow(self.saved_image["image+text"][i])
-            axs[1, 1].set_title('vgg_gram matrix mse')
-            axs[1, 1].set_xlabel(
-                'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
+                a = self.clip_global_loss(image, text)
+                b = self.clip_global_loss_feature(image, self.style_image)
+                c = self.vgg_loss_feature_gram(image, self.style_image)
+                axs[1, 1].imshow(self.saved_image["image+text"][i])
+                axs[1, 1].set_title('vgg_gram matrix mse')
+                axs[1, 1].set_xlabel(
+                    'CLIP SCORE(with prompt) = {}\nCLIP SCORE(with image) = {}\nGRAM SCORE(with image) = {}'.format(a, b, c))
 
-            if i == output_len-1:
-                self.matrix["gram_prompt"].append(float(a))
-                self.matrix["gram_image"].append(float(b))
-                self.matrix["gram_gram"].append(float(c))
+                if i == output_len-1:
+                    self.matrix["gram_prompt"].append(float(a))
+                    self.matrix["gram_image"].append(float(b))
+                    self.matrix["gram_gram"].append(float(c))
+            except:
+                pass
 
             # 調整子圖間距
             plt.tight_layout()
 
-            visualization_path = visualization_path = Path(
-                os.path.join(self.args.output_path, self.args.output_file)
-            )
             filename = Path(self.args.init_image).stem
             visualization_path = visualization_path.with_name(
-                "{}_{}_{}{}".format(filename, self.args.prompt_tgt, "{:0{width}d}".format(
-                    i, width=output_len), visualization_path.suffix)
+                "{}_{}_{}{}_{}".format(filename, self.args.prompt_tgt, "{:0{width}d}".format(
+                    i, width=output_len), visualization_path.suffix, self.args.ref_image)
             )
             plt.savefig(visualization_path)
+            '''
             visualization_path_text = str(
                 visualization_path).replace('.png', '_clip_gram_{}.png'.format(self.args.ref_image))
 
@@ -462,6 +472,7 @@ class ImageEditor:
             plt.imsave(visualization_path_image, self.saved_image["image"][i])
             plt.imsave(visualization_path_image_text,
                        self.saved_image["image+text"][i])
+            '''
 
     def edit_image_by_image(self):
         text_y_embed = self.clip_model.encode_text(
