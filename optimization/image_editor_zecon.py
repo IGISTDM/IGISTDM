@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from optimization.constants import ASSETS_DIR_NAME
 from utils.metrics_accumulator import MetricsAccumulator
-
+import time
 from numpy import random
 from optimization.augmentations import ImageAugmentations as ImageAugmentations
 from PIL import Image
@@ -455,7 +455,7 @@ class ImageEditor:
             filename = Path(self.args.init_image).stem
             visualization_path = visualization_path.with_name(
                 "{}_{}_{}_{}{}".format(filename, self.args.prompt_tgt, "{:0{width}d}".format(
-                    i, width=output_len), self.args.ref_image, visualization_path.suffix)
+                    i, width=output_len), int(time.time()), visualization_path.suffix)
             )
             plt.savefig(visualization_path)
             '''
