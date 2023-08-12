@@ -6,6 +6,9 @@ def get_arguments() -> argparse.Namespace:
 
     # Inputs
     parser.add_argument(
+        "-mod", "--mode", type=str, help="mode", required=False
+    )
+    parser.add_argument(
         "-p_t", "--prompt_tgt", type=str, help="The prompt for the desired editing", required=False
     )
     parser.add_argument(

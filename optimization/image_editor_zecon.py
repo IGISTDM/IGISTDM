@@ -123,9 +123,9 @@ class ImageEditor:
             TF.to_tensor(style_image).to(
                 self.device).unsqueeze(0).mul(2).sub(1)
         )
+        self.style_image = style_image
 
         # name rule : method_loss name
-        self.style_image = style_image
         self.matrix = {}
         self.matrix["clip_prompt"] = []
         self.matrix["clip_image"] = []
@@ -450,13 +450,13 @@ class ImageEditor:
             )
             plt.savefig(visualization_path)
             visualization_path_text = str(
-                visualization_path).replace('.png', '_clip_gram_{}.png'.format(i))
+                visualization_path).replace('.png', '_clip_gram_{}.png'.format(self.args.ref_image))
 
             visualization_path_image = str(
-                visualization_path).replace('.png', '_clip_{}.png'.format(i))
+                visualization_path).replace('.png', '_clip_{}.png'.format(self.args.ref_image))
 
             visualization_path_image_text = str(
-                visualization_path).replace('.png', '_gram_{}.png'.format(i))
+                visualization_path).replace('.png', '_gram_{}.png'.format(self.args.ref_image))
 
             plt.imsave(visualization_path_text, self.saved_image["text"][i])
             plt.imsave(visualization_path_image, self.saved_image["image"][i])
