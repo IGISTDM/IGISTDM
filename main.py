@@ -42,6 +42,6 @@ if __name__ == "__main__":
             matrix["hybrid_image"].append(
                 image_editor.matrix["hybrid_image"][0])
         index += 1
-    file_path = 'matrix_{}_{}_{}.pickle'.foramt(style, args.begin, args.end)
+    file_path = 'matrix_{}_{}_{}.pickle'.format(style, args.begin, args.end)
     with open(file_path, 'wb') as file:
         pickle.dump(matrix, file)
