@@ -1149,3 +1149,19 @@ class ImageEditor:
                             pred_image_arr = np.array(pred_image_pil)
         self.saved_image["text"].append(pred_image_arr)
         # plt.imsave(visualization_path2, pred_image_arr)
+
+    def test(self):
+        text = self.clip_model.encode_text(
+            clip.tokenize(self.args.prompt_tgt).to(self.device)
+        ).float()
+        imageb = Image.open(self.args.ref_image).convert("RGB")
+        imageb = imageb.resize(
+            self.image_size, Image.LANCZOS)  # type: ignore
+        imageb = (
+            TF.to_tensor(imageb).to(
+                self.device).unsqueeze(0).mul(2).sub(1)
+        )
+        a = self.clip_global_loss(imageb, text)
+        print("text = {},image = {}".format(
+            self.args.prompt_tgt, self.args.ref_image))
+        print(self.args.ref_image, a)
