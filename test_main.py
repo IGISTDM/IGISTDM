@@ -24,5 +24,5 @@ if __name__ == "__main__":
             #print("file_name = ", filename)
             args.ref_image = "./src_image/{}/{}".format(style, filename)
             image_editor = ImageEditor(args)
-            image_editor.test
+            image_editor.test()
         index += 1
