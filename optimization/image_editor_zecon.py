@@ -459,7 +459,7 @@ class ImageEditor:
                 "{}_{}_{}_{}{}".format(filename, self.args.prompt_tgt, "{:0{width}d}".format(
                     i, width=output_len), int(time.time()), visualization_path.suffix)
             )
-            plt.savefig(visualization_path)
+            # plt.savefig(visualization_path)
             
             visualization_path_hybrid = str(
                 visualization_path).replace('.png', '_hybrid_{}.png'.format(Path(self.args.ref_image).stem))
