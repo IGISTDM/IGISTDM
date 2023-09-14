@@ -377,8 +377,8 @@ class ImageEditor:
         '''
 
     def save_image(self):
-        output_len = len(str(len(self.saved_image["text"])))
-        for i in range(len(self.saved_image["text"])):
+        output_len = len(str(len(self.saved_image["hybrid"])))
+        for i in range(len(self.saved_image["hybrid"])):
             visualization_path = visualization_path = Path(
                 os.path.join(self.args.output_path, self.args.output_file)
             )
