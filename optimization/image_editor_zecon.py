@@ -32,6 +32,8 @@ class ImageEditor:
         self.saved_image["text"] = []
         self.saved_image["image"] = []
         self.saved_image["image+text"] = []
+        self.saved_image["hybrid"] = []
+
         self.args = args
         os.makedirs(self.args.output_path, exist_ok=True)
 
