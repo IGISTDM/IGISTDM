@@ -87,6 +87,12 @@ def get_arguments() -> argparse.Namespace:
 
     # Loss
     parser.add_argument(
+        "--l_gram",
+        type=float,
+        help="",
+        default=0,
+    )
+    parser.add_argument(
         "--l_clip_global",
         type=float,
         help="",

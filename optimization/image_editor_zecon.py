@@ -950,16 +950,11 @@ class ImageEditor:
 
                 if self.args.l_clip_global_patch != 0:
                     vgg_loss = self.vgg_loss_feature_gram(
-                        x_in, self.style_image) * self.args.l_clip_global_patch*20
+                        x_in, self.style_image) * self.args.l_gram
                     loss = loss + vgg_loss
                     self.metrics_accumulator.update_metric(
                         "vgg_loss_feature_gram : ", vgg_loss.item())
-                if self.args.l_clip_global != 0:
-                    clip_loss = self.clip_global_loss_feature(
-                        x_in, self.style_image) * self.args.l_clip_global
-                    loss = loss + clip_loss
-                    self.metrics_accumulator.update_metric(
-                        "clip_loss", clip_loss.item())
+
                 if self.args.l_clip_global_patch != 0:
                     clip_patch_loss = (self.clip_global_patch_loss_feature(
                         x_in, self.style_image) * self.args.l_clip_global_patch)
@@ -972,7 +967,7 @@ class ImageEditor:
                     y_in = self.init_image * fac + y_t * (1 - fac)
 
                     clip_dir_loss = (self.clip_dir_patch_loss_feature(
-                        x_in, y_in, self.style_image, text_y_embed) * self.args.l_clip_dir_patch)*0.5
+                        x_in, y_in, self.style_image, text_y_embed) * self.args.l_clip_dir_patch)
                     loss = loss + clip_dir_loss
                     self.metrics_accumulator.update_metric(
                         "clip_dir_loss", clip_dir_loss.item())
