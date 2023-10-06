@@ -455,9 +455,12 @@ class ImageEditor:
             plt.tight_layout()
 
             filename = Path(self.args.init_image).stem
+            # visualization_path = visualization_path.with_name(
+            #     "{}_{}_{}_{}{}".format(filename, self.args.prompt_tgt, "{:0{width}d}".format(
+            #         i, width=output_len),self.args.l_gram, visualization_path.suffix)
+            # )
             visualization_path = visualization_path.with_name(
-                "{}_{}_{}_{}{}".format(filename, self.args.prompt_tgt, "{:0{width}d}".format(
-                    i, width=output_len),self.args.l_gram, visualization_path.suffix)
+                "{}".format(visualization_path.suffix)
             )
             # plt.savefig(visualization_path)
             
