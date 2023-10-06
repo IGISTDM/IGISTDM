@@ -464,8 +464,11 @@ class ImageEditor:
             )
             # plt.savefig(visualization_path)
             
+            # visualization_path_hybrid = str(
+            #     visualization_path).replace('.png', '_hybrid_{}.png'.format(Path(self.args.ref_image).stem))
             visualization_path_hybrid = str(
-                visualization_path).replace('.png', '_hybrid_{}.png'.format(Path(self.args.ref_image).stem))
+                visualization_path).replace('.png', '{}.png'.format(Path(self.args.ref_image).stem))
+
 
             visualization_path_image = str(
                 visualization_path).replace('.png', '_clip_{}.png'.format(self.args.ref_image))
